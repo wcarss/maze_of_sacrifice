@@ -60,14 +60,30 @@ class Controls {
     this.keys = {},
     this.mouse = {},
     this.events = {
-      mousemove: event => this.set_coords(event.clientX, event.clientY),
-      keydown:   event => {console.log(event); return this.set(this.keys, event.code, true);},
-      keyup:     event => this.set(this.keys, event.code, false),
-      mousedown: event => {
+      pointermove: event => this.set_coords(event.clientX, event.clientY),
+      touchmove:   event => {
+        const touches = event.changedTouches;
+        for (let i=0; i < touches.length; i++) {
+          if (touches[i] && touches[i].pageX && touches[i].pageY) {
+            this.set_coords(touches[i].pageX, touches[i].pageY);
+          }
+        }
+        return this.set(this.mouse, 1, true);
+      },
+      touchcancel:   event => this.set(this.mouse, 1, false),
+      pointercancel: event => this.set(this.mouse, event.which, false),
+      keydown:     event => this.set(this.keys, event.code, true),
+      keyup:       event => this.set(this.keys, event.code, false),
+      pointerdown: event => {
         this.set_coords(event.clientX, event.clientY);
         return this.set(this.mouse, event.which, true);
       },
-      mouseup:   event => this.set(this.mouse, event.which, false)
+      touchstart:  event => {
+        this.set_coords(event.clientX, event.clientY);
+        return this.set(this.mouse, 1, true);
+      },
+      pointerup:   event => this.set(this.mouse, event.which, false),
+      touchend:    event => this.set(this.mouse, 1, false)
     };
 
     for (const event_name in this.events) {
@@ -95,12 +111,16 @@ class Controls {
       time: this.creek.get('time').get_ticks()
     };
 
+    if (navigator.maxTouchPoints !== 0) {
+      return false;
+    }
     return true;
   };
   
   set_coords (x, y) {
     this.mouse.x = x;
     this.mouse.y = y;
+    return false;
   };
 
   get_key (id) {
@@ -149,7 +169,6 @@ class Updater {
       if (this.controls.check_key('ShiftLeft') && this.controls.check_key('Backquote')) {
         debugger;
       }
-      if (!element.update) debugger;
       element.update(this.creek);
     });
   };
@@ -158,11 +177,22 @@ class Updater {
 class Context {
   constructor () {};
 
-  init (creek) {
+  set_max_size() {
     const canvas = document.getElementById("canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    if (navigator.maxTouchPoints !== 0) {
+      canvas.height = window.innerHeight+80;
+      window.scrollTo(0, 1);
+    }
     this.context = canvas.getContext("2d");
     this.width = canvas.width;
     this.height = canvas.height;
+  };
+
+  init (creek) {
+    this.set_max_size();
+    window.addEventListener('resize', event => this.set_max_size());
   };
 
   get () {
