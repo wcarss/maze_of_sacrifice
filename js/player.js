@@ -12,6 +12,7 @@ class Player {
     this.previous_check = {};
     this.palette = palette;
     this.creek = creek;
+    this.followers = 1;
   }
 
   get_key (x, y) {
@@ -25,7 +26,7 @@ class Player {
       ticks = this.creek.get('time').ticks,
       prev = null;
 
-    context.globalAlpha = 0.32;
+    context.globalAlpha = 0.52;
     for (let i = 0; i < this.previous.length; i++) {
       x = this.previous[i][0];
       y = this.previous[i][1];
@@ -124,20 +125,19 @@ class Player {
     this.x = new_x;
     this.y = new_y;
     if (this.last_x !== this.x || this.last_y !== this.y) {
-      console.log('x is not the same');
       prev_check = this.previous_check[this.get_key(this.x, this.y)];
       if (prev_check === undefined || prev_check.removed) {
         this.previous.push([this.x, this.y]);
         prev_check = {size: (prev_check && prev_check.size) || 13, color: null};
-        //if (this.previous.length > 60) {
-        //  this.previous.shift();
-        //  prev_check.removed = true;
-        //}
-      } else {
-        //this.previous.push(this.previous.shift());
-        if (prev_check.size > 6) {
-          prev_check.size -= 2;
+        if (this.previous.length > this.followers) {
+          this.previous.shift();
+          prev_check.removed = true;
         }
+      } else {
+        this.previous.push(this.previous.shift());
+        //if (prev_check.size > 6) {
+        //  prev_check.size -= 2;
+        //}
       }
       this.previous_check[this.get_key(this.x, this.y)] = prev_check;
     }

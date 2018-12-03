@@ -5,6 +5,7 @@ import Square from './square.js';
 import make_maze from './make_maze.js';
 import Player from './player.js';
 import {Start, End} from './goals.js';
+import NPCs from './npcs.js';
 
 window.onload = () => {
   const creek = new Creek();
@@ -37,15 +38,18 @@ window.onload = () => {
   let player = new Player(creek, 1, 1, x_size, y_size, palette.slice(0,1), palette.slice(1)),
     start = new Start(1, 1, x_size, y_size, bg),
     end = new End(width-1, height-1, x_size, y_size, bg),
+    npcs = new NPCs(10, width, height, x_size, y_size, palette.slice(1)),
     restart = function () { location.reload(); };
 
   grid_array.push(start);
   grid_array.push(end);
   grid_array.push(player);
+  grid_array.push(...npcs.get_npcs());
 
   creek.get('data').set('player', player);
   creek.get('data').set('grid', grid);
   creek.get('data').set('next_map', restart);
+  creek.get('data').set('npcs', npcs);
   creek.get('data').set('entity_list', grid_array);
 
   // really good one: seed&palette 172

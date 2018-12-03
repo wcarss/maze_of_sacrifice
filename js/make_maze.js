@@ -187,6 +187,25 @@ function make_maze (width, height, x_size, y_size, color) {
     }
   }
 
+  const openness_parameter = 78; // 18 random walls will come down!
+  let tile = null, new_tile = null;
+  for (let i = 0; i < openness_parameter; i++) {
+    x = random_int(width-3)+2;
+    y = random_int(height-3)+2;
+    tile = grid.tiles[get_key(x, y)]
+    shuffle(directions);
+    for (dir_index = 0; dir_index < directions.length; dir_index++) {
+      dir = directions[dir_index];
+      if (tile.walls[dir]) {
+        tile.walls[dir] = false;
+        new_tile = grid.tiles[get_key(x+dx[dir],y+dy[dir])]
+        if (!new_tile) debugger;
+        grid.tiles[get_key(x+dx[dir],y+dy[dir])].walls[opposite[dir]] = false;
+        break;
+      } 
+    }
+  }
+
   grid.reveal = reveal;
   grid.visit = visit;
   grid.key = get_key;
