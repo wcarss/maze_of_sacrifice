@@ -56,9 +56,7 @@ class Player {
     const time = creek.get('time'),
       controls = creek.get('controls'),
       grid = creek.get('data').get('grid'),
-      key = grid.key,
-      reveal = grid.reveal,
-      visit = grid.visit,
+      key = grid.get_key,
       tile = grid.tiles[key(this.x, this.y)];
 
     let new_x = this.x,
@@ -67,8 +65,8 @@ class Player {
       dir = null,
       prev_check = null;
 
-    visit(grid, this.x, this.y, 2);
-    reveal(grid, this.x, this.y, 8);
+    grid.visit(this.x, this.y, 2);
+    grid.reveal(this.x, this.y, 8);
 
     if (navigator.maxTouchPoints !== 0) {
       let mouse = controls.get_mouse();

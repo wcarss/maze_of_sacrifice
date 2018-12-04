@@ -2,7 +2,7 @@
 
 import Creek from './creek/creek.js';
 import Square from './square.js';
-import make_maze from './make_maze.js';
+import Maze from './maze.js';
 import Player from './player.js';
 import {Start, End} from './goals.js';
 import NPCs from './npcs.js';
@@ -29,7 +29,8 @@ window.onload = () => {
   document.getElementsByTagName('body')[0].setAttribute('style', `background: ${bg}`);
   //const squares = make_squares(10000, Math.random()*200 |0, palette);
   const width = 33, height = 16, x_size = 40, y_size = 40;
-  const grid = make_maze(width, height, x_size, y_size, palette.pop());
+  const grid = new Maze("the_maze", width, height, x_size, y_size, palette.pop());
+  grid.generate();
   let grid_array = [];
   Object.keys(grid.tiles).forEach(key => {
     grid_array.push(grid.tiles[key]); 
