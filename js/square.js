@@ -1,6 +1,6 @@
 "use strict";
 
-import Palettes from '/js/palettes.js';
+import Palettes from './palettes.js';
 
 class Square  {
   static get_palette_id (seed) {
