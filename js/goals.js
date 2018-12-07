@@ -26,6 +26,7 @@ class End {
     this.y_size = y_size;
     this.color = color;
     this.layer = 1;
+    this.last_level = 8;
   }
 
   draw (context, interpolation) {
@@ -36,6 +37,12 @@ class End {
   update (creek) {
     const player = creek.get('data').get('player');
     if (player.x === this.x && player.y === this.y) {
+      player.previous_check = {};
+      player.previous = [];
+      if (creek.get('data').get('level') >= this.last_level) {
+        creek.get('data').set('level', 0);
+      }
+      creek.get('context').get().clearRect(0, 0, creek.get('context').get_width(), creek.get('context').get_height());
       creek.get('data').get('next_map')();
     }
   }

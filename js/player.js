@@ -32,6 +32,7 @@ class Player {
       y = this.previous[i][1];
 
       prev = this.previous_check[this.get_key(x, y)];
+      if (!prev) continue;
 
       if (!prev.drew_trail_at || ticks - prev.drew_trail_at > 2000) {
         prev.color_index = prev.color_index === undefined ? 0 : (prev.color_index + 1) % this.palette.length;

@@ -41,14 +41,26 @@ window.onload = () => {
 
     let grid_backer = palette.pop(),
       list = [],
-      start = new Start(1, 1, tile_size_lookup[level], tile_size_lookup[level], palette[0]),
-      end = new End(map_size_lookup[level]-1, map_size_lookup[level]-1, tile_size_lookup[level], tile_size_lookup[level], palette[0]),
+      start = new Start(1, 1, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
+      end = new End(map_size_lookup[level]-1, map_size_lookup[level]-1, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
       maze = new Maze(`maze_${level}`, map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], grid_backer),
-      npcs = new NPCs(npc_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1));
+      npcs = new NPCs(npc_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1)),
+      background = {
+        width: map_size_lookup[level], height: map_size_lookup[level],
+        x_size: tile_size_lookup[level], y_size: tile_size_lookup[level],
+        color: grid_backer,
+        draw: function (context, interpolation) {
+          context.fillStyle = this.color,
+          context.fillRect(this.x_size, this.y_size, (this.width-1)*this.x_size, (this.height-1)*this.y_size);
+        },
+        update: function (creek) {}
+      }
 
     player.x_size = tile_size_lookup[level];
     player.y_size = tile_size_lookup[level];
+    player.color = palette[0];
 
+    list.push(background);
     Object.keys(maze.tiles).forEach(key => {
       list.push(maze.tiles[key]);
     });

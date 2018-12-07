@@ -82,9 +82,6 @@ class Maze {
 
     while (cells.length > 0) {
       count += 1;
-      // if (count > 50) {
-      //   break;
-      // }
       index = this.next_index(cells.length);
       x = cells[index][0];
       y = cells[index][1];
@@ -110,7 +107,7 @@ class Maze {
       }
     }
 
-    const openness_parameter = 0.125*this.width*this.height; // 18 random walls will come down!
+    const openness_parameter = 0.085*this.width*this.height; // random walls will come down!
     let tile = null, new_tile = null;
     for (let i = 0; i < openness_parameter; i++) {
       x = random_int(this.width-3)+2;
@@ -133,10 +130,6 @@ class Maze {
     if (!tile) debugger;
 
     tile.visited = true;
-
-    if (mark_dirty) {
-      tile.dirty = true;
-    }
 
     if (n < 1) {
       return;
@@ -207,69 +200,12 @@ class Tile {
   }
 
   draw (context, interpolation) {
-    if (!this.dirty) {
-      return;
-    }
-
-    if (!this.visited && !this.revealed) {
-      context.fillStyle = "black";
-      context.fillRect(this.x, this.y, this.x_size, this.y_size); 
-      this.dirty = false;
-      return;
-    }
-
-    if (!this.visited && this.revealed) {
-      context.fillStyle = this.color;
-      context.fillRect(this.x, this.y, this.x_size, this.y_size);
-
-      context.fillStyle = "black";
-      if (this.walls.n) {
-        context.fillRect(this.x, this.y, this.x_size+2, 2);
-      }
-      if (this.walls.s) {
-        context.fillRect(this.x, this.y+this.y_size-2, this.x_size+2, 2);
-      }
-      if (this.walls.e) {
-        context.fillRect(this.x+this.x_size-2, this.y, 2, this.y_size+2);
-      }
-      if (this.walls.w) {
-        context.fillRect(this.x, this.y, 2, this.y_size+2);
-      }
-     
-      context.globalAlpha = 0.8;
-      context.fillRect(this.x, this.y, this.x_size, this.y_size); 
-      context.globalAlpha = 1;
-      this.dirty = false;
-      return;
-    }
-    
-    if (this.visited && this.firstVisit) {
-      context.fillStyle = this.color;
-      context.fillRect(this.x, this.y, this.x_size, this.y_size);
-
-      context.fillStyle = "black";
-      if (this.walls.n) {
-        context.fillRect(this.x, this.y, this.x_size+2, 2);
-      }
-      if (this.walls.s) {
-        context.fillRect(this.x, this.y+this.y_size-2, this.x_size+2, 2);
-      }
-      if (this.walls.e) {
-        context.fillRect(this.x+this.x_size-2, this.y, 2, this.y_size+2);
-      }
-      if (this.walls.w) {
-        context.fillRect(this.x, this.y, 2, this.y_size+2);
-      }
-
-      this.firstVisit = false;
-      this.dirty = false;
-    } else {
-      context.fillStyle = this.color;
-      context.fillRect(this.x+2, this.y+2, this.x_size-4, this.x_size-4);
-      this.dirty = false;
-    }
-
     context.fillStyle = "black";
+    if (!this.visited && !this.revealed) {
+      context.fillRect(this.x, this.y, this.x_size, this.y_size); 
+      return;
+    }
+
     if (this.walls.n) {
       context.fillRect(this.x, this.y, this.x_size+2, 2);
     }
@@ -281,6 +217,12 @@ class Tile {
     }
     if (this.walls.w) {
       context.fillRect(this.x, this.y, 2, this.y_size+2);
+    }
+
+    if (!this.visited && this.revealed) {
+      context.globalAlpha = 0.8;
+      context.fillRect(this.x, this.y, this.x_size, this.y_size);
+      context.globalAlpha = 1;
     }
   }
 
