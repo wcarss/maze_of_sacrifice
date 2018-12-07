@@ -128,10 +128,15 @@ class Maze {
     }
   }
 
-  visit(x, y, n) {
+  visit(x, y, n, mark_dirty) {
     let tile = this.tiles[this.get_key(x, y)];
     if (!tile) debugger;
+
     tile.visited = true;
+
+    if (mark_dirty) {
+      tile.dirty = true;
+    }
 
     if (n < 1) {
       return;
@@ -155,6 +160,7 @@ class Maze {
     let tile = this.tiles[this.get_key(x, y)];
     if (!tile) debugger;
     tile.revealed = true;
+    tile.dirty = true;
 
     if (n < 1) {
       return;
@@ -186,6 +192,8 @@ class Tile {
     this.y = y*y_size;
     this.x_size = x_size;
     this.y_size = y_size;
+    this.firstVisit = true;
+    this.dirty = true;
     this.visited = false;
     this.revealed = false;
     this.walls = {
@@ -199,29 +207,80 @@ class Tile {
   }
 
   draw (context, interpolation) {
-    context.fillStyle = this.color;
-    context.fillRect(this.x, this.y, this.x_size, this.y_size);
-
-    context.fillStyle = "black";
-    if (this.walls.n) {
-      context.fillRect(this.x-2, this.y-2, this.x_size+2, 4);
-    }
-    if (this.walls.s) {
-      context.fillRect(this.x-2, this.y+this.y_size-2, this.x_size+2, 4);
-    }
-    if (this.walls.e) {
-      context.fillRect(this.x+this.x_size-2, this.y-2, 3, this.y_size+2);
-    }
-    if (this.walls.w) {
-      context.fillRect(this.x-2, this.y-2, 4, this.y_size+2);
+    if (!this.dirty) {
+      return;
     }
 
-    if (this.revealed && !this.visited) {
+    if (!this.visited && !this.revealed) {
+      context.fillStyle = "black";
+      context.fillRect(this.x, this.y, this.x_size, this.y_size); 
+      this.dirty = false;
+      return;
+    }
+
+    if (!this.visited && this.revealed) {
+      context.fillStyle = this.color;
+      context.fillRect(this.x, this.y, this.x_size, this.y_size);
+
+      context.fillStyle = "black";
+      if (this.walls.n) {
+        context.fillRect(this.x, this.y, this.x_size+2, 2);
+      }
+      if (this.walls.s) {
+        context.fillRect(this.x, this.y+this.y_size-2, this.x_size+2, 2);
+      }
+      if (this.walls.e) {
+        context.fillRect(this.x+this.x_size-2, this.y, 2, this.y_size+2);
+      }
+      if (this.walls.w) {
+        context.fillRect(this.x, this.y, 2, this.y_size+2);
+      }
+     
       context.globalAlpha = 0.8;
       context.fillRect(this.x, this.y, this.x_size, this.y_size); 
       context.globalAlpha = 1;
-    } else if (!this.visited) {
-      context.fillRect(this.x, this.y, this.x_size, this.y_size); 
+      this.dirty = false;
+      return;
+    }
+    
+    if (this.visited && this.firstVisit) {
+      context.fillStyle = this.color;
+      context.fillRect(this.x, this.y, this.x_size, this.y_size);
+
+      context.fillStyle = "black";
+      if (this.walls.n) {
+        context.fillRect(this.x, this.y, this.x_size+2, 2);
+      }
+      if (this.walls.s) {
+        context.fillRect(this.x, this.y+this.y_size-2, this.x_size+2, 2);
+      }
+      if (this.walls.e) {
+        context.fillRect(this.x+this.x_size-2, this.y, 2, this.y_size+2);
+      }
+      if (this.walls.w) {
+        context.fillRect(this.x, this.y, 2, this.y_size+2);
+      }
+
+      this.firstVisit = false;
+      this.dirty = false;
+    } else {
+      context.fillStyle = this.color;
+      context.fillRect(this.x+2, this.y+2, this.x_size-4, this.x_size-4);
+      this.dirty = false;
+    }
+
+    context.fillStyle = "black";
+    if (this.walls.n) {
+      context.fillRect(this.x, this.y, this.x_size+2, 2);
+    }
+    if (this.walls.s) {
+      context.fillRect(this.x, this.y+this.y_size-2, this.x_size+2, 2);
+    }
+    if (this.walls.e) {
+      context.fillRect(this.x+this.x_size-2, this.y, 2, this.y_size+2);
+    }
+    if (this.walls.w) {
+      context.fillRect(this.x, this.y, 2, this.y_size+2);
     }
   }
 

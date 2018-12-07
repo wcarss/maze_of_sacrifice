@@ -223,7 +223,7 @@ class Drawer {
     const context = this.context.get();
     this.list = this.entities.get();
 
-    context.clearRect(0, 0, this.context.get_width(), this.context.get_height());
+//    context.clearRect(0, 0, this.context.get_width(), this.context.get_height());
     this.list.forEach(element => {
       element.draw(context, interpolation);
     });
