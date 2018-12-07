@@ -110,7 +110,7 @@ class Maze {
       }
     }
 
-    const openness_parameter = 128; // 18 random walls will come down!
+    const openness_parameter = 0.125*this.width*this.height; // 18 random walls will come down!
     let tile = null, new_tile = null;
     for (let i = 0; i < openness_parameter; i++) {
       x = random_int(this.width-3)+2;
