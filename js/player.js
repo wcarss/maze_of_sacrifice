@@ -62,11 +62,9 @@ class Player {
     let new_x = this.x,
       new_y = this.y,
       move_distance = 1,
-      dir = null,
+      vdir = null,
+      hdir = null,
       prev_check = null;
-
-    grid.visit(this.x, this.y, 2);
-    grid.reveal(this.x, this.y, 8);
 
     if (navigator.maxTouchPoints !== 0) {
       let mouse = controls.get_mouse();
@@ -80,43 +78,48 @@ class Player {
 
       if (mouse.pressed) {
         if (mouse.x < third_x && !tile.walls.w) {
-          dir = 'w';
+          vdir = 'w';
           new_x = this.x - move_distance;
         } else if (mouse.x > top_third_x && !tile.walls.e) {
-          dir = 'e';
+          vdir = 'e';
           new_x = this.x + move_distance;
         }
+
         if (mouse.y < third_y && !tile.walls.n) {
-          dir = 'n';
+          hdir = 'n';
           new_y = this.y - move_distance;
         } else if (mouse.y > top_third_y && !tile.walls.s) {
-          dir = 's';
+          hdir = 's';
           new_y = this.y + move_distance;
         }
       }
     } else {
-        if (controls.check_key('ArrowUp') && !tile.walls.n) {
-          dir = 'n';
-          new_y = this.y - move_distance;
+      if (controls.check_key('ArrowUp') && !tile.walls.n) {
+        vdir = 'n';
+        new_y = this.y - move_distance;
       } else if (controls.check_key('ArrowDown') && !tile.walls.s) {
-        dir = 's';
+        vdir = 's';
         new_y = this.y + move_distance;
       }
 
       if (controls.check_key('ArrowLeft') && !tile.walls.w) {
-        dir = 'w';
+        hdir = 'w';
         new_x = this.x - move_distance;
       } else if (controls.check_key('ArrowRight') && !tile.walls.e) {
-        dir = 'e';
+        hdir = 'e';
         new_x = this.x + move_distance;
       }
     }
-    if (dir === null) return;
 
-    if ((this.last_dir && this.moved_at) && (time.ticks - this.moved_at < 95) && dir === this.last_dir) {
-      // don't move more than once / 50ms in the same direction
+    if (vdir === null && hdir === null) return;
+
+    if (((this.last_vdir || this.last_hdir) && this.moved_at) && (time.ticks - this.moved_at < 150) && (vdir === this.last_vdir || hdir === this.last_hdir)) {
+      // don't move more than once / 150ms in the same direction
       return;
     }
+
+    grid.visit(this.x, this.y, 2, true);
+    grid.reveal(this.x, this.y, 8);
 
     this.last_x = this.x;
     this.last_y = this.y;
@@ -140,7 +143,12 @@ class Player {
       this.previous_check[this.get_key(this.x, this.y)] = prev_check;
     }
     this.moved_at = time.ticks;
-    this.last_dir = dir;
+    if (vdir) {
+      this.last_vdir = vdir;
+    }
+    if (hdir) {
+      this.last_hdir = hdir;
+    }
   }
 }
 
