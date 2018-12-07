@@ -43,6 +43,7 @@ class Maze {
     this.x_size = x_size;
     this.y_size = y_size;
     this.color = color;
+    this.generate();
   }
 
   next_index(num) {
@@ -109,7 +110,7 @@ class Maze {
       }
     }
 
-    const openness_parameter = 78; // 18 random walls will come down!
+    const openness_parameter = 128; // 18 random walls will come down!
     let tile = null, new_tile = null;
     for (let i = 0; i < openness_parameter; i++) {
       x = random_int(this.width-3)+2;

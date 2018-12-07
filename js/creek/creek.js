@@ -240,9 +240,7 @@ class Entities {
   };
 
   get () {
-    if (!this.list) {
-      this.list = this.data.get('entity_list');
-    }
+    this.list = this.data.get('entity_list');
     return this.list;
   };
 };
