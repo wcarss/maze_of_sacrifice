@@ -138,6 +138,30 @@ window.onload = () => {
   	}
   ])*/
 
-  creek.init();
-  creek.run();
+  const resources = [
+    {
+      "type": "sound",
+      "url": "resources/sounds/pickup.wav",
+      "id": "pickup",
+      "muted": false,
+      "volume": 0.6,
+      "looping": false,
+    },
+    {
+      "type": "image",
+      "url": "resources/images/player.png",
+      "id": "player",
+      "source_x": 0,
+      "source_y": 5,
+      "source_width": 26,
+      "source_height": 26,
+      "width": 26,
+      "height": 32,
+    }
+  ];
+
+  creek.get('resources').init(creek, resources).then(() => {
+    creek.init();
+    creek.run();
+  });
 };
