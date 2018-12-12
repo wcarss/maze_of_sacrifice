@@ -12,7 +12,7 @@ class Player {
     this.previous_check = {};
     this.palette = palette;
     this.creek = creek;
-    this.followers = 1;
+    this.followers = 0;
   }
 
   get_key (x, y) {
@@ -26,7 +26,7 @@ class Player {
       ticks = this.creek.get('time').ticks,
       prev = null;
 
-    context.globalAlpha = 0.52;
+    /*context.globalAlpha = 0.52;
     for (let i = 0; i < this.previous.length; i++) {
       x = this.previous[i][0];
       y = this.previous[i][1];
@@ -44,7 +44,7 @@ class Player {
       size = 20-prev.size;
       context.fillRect(x*this.x_size+size, y*this.y_size+size, this.x_size-size*2, this.y_size-size*2);
     }
-    this.drew_trail_at = ticks;
+    this.drew_trail_at = ticks;*/
 
     context.globalAlpha = 1;
     context.fillStyle = 'black';
@@ -126,6 +126,7 @@ class Player {
     this.last_y = this.y;
     this.x = new_x;
     this.y = new_y;
+
     if (this.last_x !== this.x || this.last_y !== this.y) {
       prev_check = this.previous_check[this.get_key(this.x, this.y)];
       if (prev_check === undefined || prev_check.removed) {

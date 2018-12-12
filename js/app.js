@@ -25,13 +25,13 @@ window.onload = () => {
       palette = get_palette(seed),
       level = (data.get('level') || 0) + 1,
       map_size_lookup = {
-        1: 6, 2: 8, 3: 10, 4: 10, 5: 10, 6: 14, 7: 14, 8: 20, 9: 20, 10: 30, 11: 30
+        1: 6, 2: 8, 3: 10, 4: 10, 5: 10, 6: 14, 7: 14, 8: 20, 9: 20, 10: 30, 11: 30, 12: 30,
       },
       tile_size_lookup = {
-        1: 60, 2: 50, 3: 40, 4: 40, 5: 40, 6: 30, 7: 30, 8: 24, 9: 24, 10: 24, 11: 24
+        1: 60, 2: 50, 3: 40, 4: 40, 5: 40, 6: 30, 7: 30, 8: 24, 9: 24, 10: 24, 11: 24, 12: 24
       },
       npc_count_lookup = {
-        1: 1, 2: 2, 3: 4, 4: 4, 5: 6, 6: 6, 7: 8, 8: 10, 9: 10, 10: 10, 11: 12
+        1: 2, 2: 4, 3: 6, 4: 8, 5: 12, 6: 16, 7: 16, 8: 24, 9: 24, 10: 24, 11: 32, 12: 32
       };
 
     console.log(`Seed: ${seed} and palette id: ${Square.get_palette_id(seed)}`);
@@ -138,6 +138,82 @@ window.onload = () => {
   	}
   ])*/
 
-  creek.init();
-  creek.run();
+  class Sound {
+    constructor(id, url, muted, volume, looping) {
+      url = url || `resources/sounds/${id}.wav`;
+      muted = muted || false;
+      volume = volume || 0.6;
+      looping = looping || false;
+
+      this.id = id;
+      this.url = url;
+      this.muted = muted;
+      this.volume = volume;
+      this.looping = looping;
+    }
+
+    get() {
+      return {
+        "type": "sound",
+        "url": this.url,
+        "id": this.id,
+        "muted": this.muted,
+        "volume": this.volume,
+        "looping": this.looping,
+      };
+    }
+  }
+
+  const resources = [
+    new Sound("pickup").get(),
+    new Sound("pickup_c").get(),
+    new Sound("pickup_c_sharp").get(),
+    new Sound("pickup_d").get(),
+    new Sound("pickup_e_flat").get(),
+    new Sound("pickup_e").get(),
+    new Sound("pickup_f").get(),
+    new Sound("pickup_f_sharp").get(),
+    new Sound("pickup_g").get(),
+    new Sound("pickup_g_sharp").get(),
+    new Sound("pickup_a").get(),
+    new Sound("pickup_b_flat").get(),
+    new Sound("pickup_b").get(),
+    new Sound("pickup_c_2").get(),
+    new Sound("pickup_c_sharp_2").get(),
+    new Sound("pickup_d_2").get(),
+    new Sound("pickup_e_flat_2").get(),
+    new Sound("pickup_e_2").get(),
+    new Sound("pickup_f_2").get(),
+    new Sound("pickup_success_c_2").get(),
+    new Sound("pickup_success_f_2").get(),
+    new Sound("level").get(),
+    new Sound("bwuh_2").get(),
+    new Sound("bwuh_low").get(),
+    new Sound("cave_hopping", "resources/sounds/cave_hopping_longer.mp3", false, 0.6, true).get(),
+    {
+      "type": "image",
+      "url": "resources/images/player.png",
+      "id": "player",
+      "source_x": 0,
+      "source_y": 5,
+      "source_width": 26,
+      "source_height": 26,
+      "width": 26,
+      "height": 32,
+    }
+  ];
+
+  creek.get('resources').init(creek, resources).then(() => {
+    let div = document.createElement('div');
+    div.innerHTML = "<div style='width: 20%; margin: 20% auto;'>Click to play!</div>";
+    div.setAttribute('style', 'background: black; color: white; font-size: 3em; position: absolute; top: 0; left: 0; width: 100%; height: 100%;');
+    div.id = "sound_guy";
+    div.addEventListener('click', () => {
+      creek.get('audio').play('cave_hopping');
+      div.parentNode.removeChild(div);
+    });
+    document.body.appendChild(div);
+    creek.init();
+    creek.run();
+  });
 };

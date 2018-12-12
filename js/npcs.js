@@ -9,6 +9,8 @@ class NPCs {
 
   constructor (number, width, height, x_size, y_size, palette) {
     this.npcs = [];
+    this.number = number;
+    this.found = 0;
     this.map_width = width;
     this.map_height = height;
     this.palette = palette;
@@ -29,6 +31,38 @@ class NPCs {
       positions[this.get_key(x, y)] = true;
       this.npcs.push(new NPC(`npc_${i}`, x, y, x_size, y_size, palette))
       this.npc_id_lookup[`npc_${i}`] = this.npcs.length-1;
+    }
+  }
+
+  static lookup_sound(num) {
+    
+    const sounds = {
+      0 : "pickup_c",
+      1 : "pickup_c_sharp",
+      2 : "pickup_d",
+      3 : "pickup_e_flat",
+      4 : "pickup_e",
+      5 : "pickup_f",
+      6 : "pickup_f_sharp",
+      7 : "pickup_g",
+      8 : "pickup_g_sharp",
+      9 : "pickup_a",
+      10 : "pickup_b_flat",
+      11 : "pickup_b",
+      12 : "pickup_c_2",
+      13 : "pickup_c_sharp_2",
+      14 : "pickup_d_2",
+      15 : "pickup_e_flat_2",
+      16 : "pickup_e_2",
+      17 : "pickup_f_2",
+    }
+
+    if (num !== 0 && num % 16 == 0) {
+      return "pickup_success_f_2";
+    } else if (num !== 0 && num % 8 == 0) {
+      return "pickup_success_c_2";
+    } else {
+      return sounds[num % 16];
     }
   }
 
@@ -67,6 +101,7 @@ class NPC {
 
     if (player.x === this.x && player.y === this.y) {
       player.followers += 1;
+      creek.get('audio').play(NPCs.lookup_sound(player.followers));
       this.active = false;
     }
   }

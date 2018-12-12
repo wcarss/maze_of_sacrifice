@@ -26,7 +26,7 @@ class End {
     this.y_size = y_size;
     this.color = color;
     this.layer = 1;
-    this.last_level = 8;
+    this.last_level = 12;
   }
 
   draw (context, interpolation) {
@@ -43,6 +43,7 @@ class End {
         creek.get('data').set('level', 0);
       }
       creek.get('context').get().clearRect(0, 0, creek.get('context').get_width(), creek.get('context').get_height());
+      creek.get('audio').play('level');
       creek.get('data').get('next_map')();
     }
   }

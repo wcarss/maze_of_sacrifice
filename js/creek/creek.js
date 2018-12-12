@@ -1,7 +1,10 @@
 "use strict";
 
+import Audio from './audio.js';
+import Resources from './resources.js';
+
 class Creek {
-  constructor (modules) {
+  constructor () {
     this.modules = {
       looper: new Looper(),
       updater: new Updater(),
@@ -11,6 +14,8 @@ class Creek {
       data: new Data(),
       controls: new Controls(),
       entities: new Entities(),
+      audio: new Audio(),
+      resources: new Resources(),
     };
   };
 
@@ -19,7 +24,7 @@ class Creek {
 
     for (const module_name in this.modules) {
       module = this.modules[module_name];
-      if (module.init) {
+      if (module.init && !module.has_done_init) {
         module.init(this);
       }
     }
@@ -31,7 +36,7 @@ class Creek {
     const got = this.modules[id];
 
     if (!got) {
-      console.error("requested nonexistent module " + id);
+      console.error(`requested nonexistent module '${id}'`);
     }
 
     return got;
