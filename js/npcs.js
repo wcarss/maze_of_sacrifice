@@ -7,10 +7,12 @@ class NPCs {
     return `${x}_${y}`;
   }
 
-  constructor (number, width, height, x_size, y_size, palette) {
+  constructor (number, width, height, x_size, y_size, palette, maze) {
     this.npcs = [];
     this.number = number;
     this.found = 0;
+    width *= 2;
+    height *= 2;
     this.map_width = width;
     this.map_height = height;
     this.palette = palette;
@@ -20,13 +22,13 @@ class NPCs {
       y = random_int(height-1)+1,
       positions = {};
 
-    positions[this.get_key(1, 1)] = true;
-    positions[this.get_key(width-1, height-1)] = true;
+    positions[this.get_key(2, 2)] = true;
+    positions[this.get_key(width-2, height-2)] = true;
 
     for (let i = 0; i < number; i++) {
-      while (positions[this.get_key(x, y)]) {
-        x = random_int(width-1)+1;
-        y = random_int(height-1)+1;
+      while (positions[this.get_key(x, y)] || maze.tiles[maze.get_key(x, y)].wall) {
+        x = random_int(width-2)+1;
+        y = random_int(height-2)+1;
       }
       positions[this.get_key(x, y)] = true;
       this.npcs.push(new NPC(`npc_${i}`, x, y, x_size, y_size, palette))
@@ -82,7 +84,7 @@ class NPC {
     this.y = y;
     this.x_size = x_size;
     this.y_size = y_size;
-    this.color = random_int(palette.length);
+    this.color = palette[random_int(palette.length)];
     this.layer = 2;
     this.active = true;
   }
@@ -100,7 +102,11 @@ class NPC {
     const player = creek.get('data').get('player');
 
     if (player.x === this.x && player.y === this.y) {
+      player.health += 1;
       player.followers += 1;
+      if (player.health > player.max_health) {
+        player.health = player.max_health;
+      }
       creek.get('audio').play(NPCs.lookup_sound(player.followers));
       this.active = false;
     }

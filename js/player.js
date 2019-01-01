@@ -13,6 +13,10 @@ class Player {
     this.palette = palette;
     this.creek = creek;
     this.followers = 0;
+    this.default_wait_time = 180;
+    this.wait_time = this.default_wait_time;
+    this.max_health = 5;
+    this.health = this.max_health;
   }
 
   get_key (x, y) {
@@ -48,17 +52,36 @@ class Player {
 
     context.globalAlpha = 1;
     context.fillStyle = 'black';
-    context.fillRect(this.x*this.x_size+6, this.y*this.y_size+6, this.x_size-12, this.y_size-12);
+    context.fillRect(
+      this.x*this.x_size+6+2*(this.max_health-this.health),
+      this.y*this.y_size+6+2*(this.max_health-this.health),
+      this.x_size-(12+4*(this.max_health-this.health)),
+      this.y_size-(12+4*(this.max_health-this.health))
+    );
     context.fillStyle = this.color;
-    context.fillRect(this.x*this.x_size+8, this.y*this.y_size+8, this.x_size-16, this.y_size-16);
+    context.fillRect(
+      this.x*this.x_size+8+2*(this.max_health-this.health),
+      this.y*this.y_size+8+2*(this.max_health-this.health),
+      this.x_size-(16+4*(this.max_health-this.health)),
+      this.y_size-(16+4*(this.max_health-this.health))
+    );
   }
 
   update(creek) {
     const time = creek.get('time'),
       controls = creek.get('controls'),
       grid = creek.get('data').get('grid'),
+      enemies = creek.get('data').get('enemies'),
       key = grid.get_key,
-      tile = grid.tiles[key(this.x, this.y)];
+      tile = grid.tiles[key(this.x, this.y)],
+      n  = grid.tiles[key(this.x, this.y-1)],
+      s  = grid.tiles[key(this.x, this.y+1)],
+      e  = grid.tiles[key(this.x+1, this.y)],
+      w  = grid.tiles[key(this.x-1, this.y)],
+      nw = grid.tiles[key(this.x-1, this.y-1)],
+      ne = grid.tiles[key(this.x+1, this.y-1)],
+      sw = grid.tiles[key(this.x-1, this.y+1)],
+      se = grid.tiles[key(this.x+1, this.y+1)];
 
     let new_x = this.x,
       new_y = this.y,
@@ -67,7 +90,46 @@ class Player {
       hdir = null,
       prev_check = null;
 
-    if (navigator.maxTouchPoints !== 0) {
+    if (this.health < 1) {
+      console.log('player lost!');
+      creek.get('data').set('game_running', false);
+    }
+
+    if (controls.check_key('Space') && (!this.attacked_at || (time.ticks - this.attacked_at > 500))) {
+      this.attacked_at = time.ticks;
+      enemies.give_damage_xy(this.x, this.y);
+      this.last_color = this.color;
+      this.color = "white";
+    } else if (this.last_color) {
+      this.color = this.last_color;
+      this.last_color = null;
+    }
+
+/* for ice-world/sliding puzzle style
+ *
+ * if (this.last_hdir === 'w' && !w.wall) {
+      hdir = 'w';
+      new_x = this.x - move_distance;
+      this.last_vdir = null;
+    } else if (this.last_hdir === 'e' && !e.wall) {
+      hdir = 'e';
+      new_x = this.x + move_distance;
+      this.last_vdir = null;
+    }
+
+    if (this.last_vdir === 'n' && !n.wall) {
+      vdir = 'n';
+      new_y = this.y - move_distance;
+      this.last_hdir = null;
+    } else if (this.last_vdir === 's' && !s.wall) {
+      vdir = 's';
+      new_y = this.y + move_distance;
+      this.last_hdir = null;
+    }
+  *
+  */
+
+    if ((!hdir && !vdir) && navigator.maxTouchPoints !== 0) {
       let mouse = controls.get_mouse();
       let context = creek.get('context'),
         width = context.get_width(),
@@ -78,45 +140,88 @@ class Player {
         top_third_y = height-third_y;
 
       if (mouse.pressed) {
-        if (mouse.x < third_x && !tile.walls.w) {
+        if (mouse.x < third_x && !w.wall) {
           vdir = 'w';
           new_x = this.x - move_distance;
-        } else if (mouse.x > top_third_x && !tile.walls.e) {
+        } else if (mouse.x > top_third_x && !e.wall) {
           vdir = 'e';
           new_x = this.x + move_distance;
         }
 
-        if (mouse.y < third_y && !tile.walls.n) {
+        if (mouse.y < third_y && !n.wall) {
           hdir = 'n';
           new_y = this.y - move_distance;
-        } else if (mouse.y > top_third_y && !tile.walls.s) {
+        } else if (mouse.y > top_third_y && !s.wall) {
           hdir = 's';
           new_y = this.y + move_distance;
         }
       }
-    } else {
-      if (controls.check_key('ArrowUp') && !tile.walls.n) {
+    } else if (!hdir && !vdir) {
+      if (controls.check_key('ArrowUp') && !n.wall) {
         vdir = 'n';
         new_y = this.y - move_distance;
-      } else if (controls.check_key('ArrowDown') && !tile.walls.s) {
+      } else if (controls.check_key('ArrowDown') && !s.wall) {
         vdir = 's';
         new_y = this.y + move_distance;
       }
 
-      if (controls.check_key('ArrowLeft') && !tile.walls.w) {
+      if (controls.check_key('ArrowLeft') && !w.wall) {
         hdir = 'w';
         new_x = this.x - move_distance;
-      } else if (controls.check_key('ArrowRight') && !tile.walls.e) {
+      } else if (controls.check_key('ArrowRight') && !e.wall) {
         hdir = 'e';
         new_x = this.x + move_distance;
       }
     }
 
-    if (vdir === null && hdir === null) return;
-
-    if (((this.last_vdir || this.last_hdir) && this.moved_at) && (time.ticks - this.moved_at < 150) && (vdir === this.last_vdir || hdir === this.last_hdir)) {
-      // don't move more than once / 150ms in the same direction
+    if (vdir === null && hdir === null) {
       return;
+      this.wait_time = this.default_wait_time;
+    }
+
+    if (vdir === 'n') {
+      if ((hdir === 'w' && nw.wall) || (hdir === 'e' && ne.wall)) {
+        this.wait_time = this.default_wait_time;
+        return;
+      }
+    } else if (vdir === 's') {
+      if ((hdir === 'w' && sw.wall) || (hdir === 'e' && se.wall)) {
+        this.wait_time = this.defalt_wait_time;
+        return;
+      }
+    }
+
+/* for ice-world/sliding movement idea -- allows to place blocks w/ shift+direction
+ *
+ * if (controls.check_key('ShiftLeft')) {
+      this.last_vdir = null;
+      this.last_hdir = null;
+
+      if (!this.moved_at || ((time.ticks - this.moved_at) < 200)) {
+        this.moved_at = time.ticks;
+        return;
+      }
+
+      this.moved_at = time.ticks;
+      tile.wall = true;
+    }
+*/
+    if (((this.last_vdir || this.last_hdir) && this.moved_at) && (time.ticks - this.moved_at < this.wait_time)) {
+      // don't move more than once / 40ms in the same direction
+      return;
+    }
+
+    if ((vdir && this.last_vdir === vdir) || (hdir && this.last_hdir === hdir)) {
+      this.wait_time = 40;
+    } else {
+      this.wait_time = this.default_wait_time;
+    }
+
+    if (vdir) {
+      this.last_vdir = vdir;
+    }
+    if (hdir) {
+      this.last_hdir = hdir;
     }
 
     grid.visit(this.x, this.y, 2, true);
@@ -145,12 +250,6 @@ class Player {
       this.previous_check[this.get_key(this.x, this.y)] = prev_check;
     }
     this.moved_at = time.ticks;
-    if (vdir) {
-      this.last_vdir = vdir;
-    }
-    if (hdir) {
-      this.last_hdir = hdir;
-    }
   }
 }
 

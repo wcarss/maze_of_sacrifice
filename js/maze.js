@@ -113,7 +113,7 @@ class Maze {
       openness_parameter *= 2.5;
     }
 
-    let tile = null, new_tile = null;
+    let tile = null;
     for (let i = 0; i < openness_parameter; i++) {
       x = random_int(this.width-3)+2;
       y = random_int(this.height-3)+2;
@@ -128,6 +128,50 @@ class Maze {
         } 
       }
     }
+
+    let new_tiles = {};
+    for (let i = 1; i < this.width*2; i++) {
+      for (let j = 1; j < this.height*2; j++) {
+        new_tiles[get_key(i, j)] = new NewTile(i, j, this.x_size, this.y_size, this.color, true);
+      }
+    }
+
+    for (let i = 1; i < this.width; i++) {
+      for (let j = 1; j < this.height; j++) {
+        tile = tiles[get_key(i, j)];
+
+        if (!tile) {
+          debugger;
+        }
+
+        new_tiles[get_key(i*2, j*2)].wall = false;
+        new_tiles[get_key(i*2, j*2-1)].wall = tile.walls.n;
+        new_tiles[get_key(i*2, j*2+1)].wall = tile.walls.s;
+        new_tiles[get_key(i*2+1, j*2)].wall = tile.walls.e;
+        new_tiles[get_key(i*2-1, j*2)].wall = tile.walls.w;
+      }
+    }
+
+    let n = null, s = null, e = null, w = null, ne = null, nw = null, se = null, sw = null;
+    for (let i = 3; i < this.width*2-2; i++) {
+      for (let j = 3; j < this.height*2-2; j++) {
+        tile = new_tiles[get_key(i, j)];
+        n =  new_tiles[get_key(i, j-1)].wall;
+        s =  new_tiles[get_key(i, j+1)].wall;
+        e =  new_tiles[get_key(i+1, j)].wall;
+        w =  new_tiles[get_key(i-1, j)].wall;
+        nw = new_tiles[get_key(i-1, j-1)].wall;
+        ne = new_tiles[get_key(i+1, j-1)].wall;
+        sw = new_tiles[get_key(i-1, j+1)].wall;
+        se = new_tiles[get_key(i+1, j+1)].wall;
+
+        if (!n && !s && !e && !w && !ne && !nw && !se && !sw) {
+          tile.wall = false;
+        }
+      }
+    }
+
+    this.tiles = new_tiles;
   }
 
   visit(x, y, n, mark_dirty) {
@@ -232,6 +276,22 @@ class Tile {
   }
 
   update (creek) {
+  }
+}
+
+class NewTile extends Tile {
+  constructor (x, y, x_size, y_size, color, wall) {
+    super(x, y, x_size, y_size, color);
+    this.wall = wall;
+  }
+
+  draw (context, interpolation) {
+    if (this.wall) {
+      context.fillStyle = "black";
+    } else {
+      context.fillStyle = this.color;
+    }
+    context.fillRect(this.x, this.y, this.x_size, this.y_size);
   }
 }
 

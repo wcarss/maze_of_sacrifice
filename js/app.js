@@ -6,6 +6,7 @@ import Maze from './maze.js';
 import Player from './player.js';
 import {Start, End} from './goals.js';
 import NPCs from './npcs.js';
+import Enemies from './enemies.js';
 
 window.onload = () => {
   const creek = new Creek();
@@ -24,29 +25,34 @@ window.onload = () => {
     let seed = Math.random()*200 | 0,
       palette = get_palette(seed),
       level = (data.get('level') || 0) + 1,
-      map_size_lookup = {
-        1: 6, 2: 8, 3: 10, 4: 10, 5: 10, 6: 14, 7: 14, 8: 20, 9: 20, 10: 30, 11: 30, 12: 30,
+      old_map_size_lookup = {
+        1: 6, 2: 6, 3: 8, 4: 8, 5: 8, 6: 10, 7: 10, 8: 10, 9: 14, 10: 14, 11: 14, 12: 14,
       },
-      tile_size_lookup = {
-        1: 60, 2: 50, 3: 40, 4: 40, 5: 40, 6: 30, 7: 30, 8: 24, 9: 24, 10: 24, 11: 24, 12: 24
+      old_tile_size_lookup = {
+        1: 60, 2: 60, 3: 50, 4: 50, 5: 50, 6: 40, 7: 40, 8: 40, 9: 24, 10: 24, 11: 24, 12: 24
       },
-      npc_count_lookup = {
-        1: 2, 2: 4, 3: 6, 4: 8, 5: 12, 6: 16, 7: 16, 8: 24, 9: 24, 10: 24, 11: 32, 12: 32
-      };
+      old_npc_count_lookup = {
+        1: 2, 2: 2, 3: 2, 4: 4, 5: 6, 6: 4, 7: 6, 8: 6, 9: 8, 10: 8, 11: 16, 12: 16
+      },
+      map_size_lookup  =   [0,  6,  6,  6,  6,  8,  8,  8,  8, 10, 10, 10, 14],
+      tile_size_lookup =   [0, 60, 60, 60, 60, 50, 50, 50, 50, 40, 40, 40, 24],
+      npc_count_lookup =   [0,  2,  2,  2,  2,  4,  4,  4,  4,  4,  6,  6,  8],
+      enemy_count_lookup = [0,  1,  1,  2,  2,  2,  4,  6,  6,  6,  8, 10, 12];
 
     console.log(`Seed: ${seed} and palette id: ${Square.get_palette_id(seed)}`);
     console.log(palette);
 
-    let player = data.get('player') || new Player(creek, 1, 1, tile_size_lookup[level], tile_size_lookup[level], palette.slice(0, 1), palette.slice(1));
+    let player = data.get('player') || new Player(creek, 2, 2, tile_size_lookup[level], tile_size_lookup[level], palette.slice(0, 1), palette.slice(1));
 
     let grid_backer = palette.pop(),
       list = [],
-      start = new Start(1, 1, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
-      end = new End(map_size_lookup[level]-1, map_size_lookup[level]-1, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
+      start = new Start(2, 2, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
+      end = new End((map_size_lookup[level]-1)*2, (map_size_lookup[level]-1)*2, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
       maze = new Maze(`maze_${level}`, map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], grid_backer),
-      npcs = new NPCs(npc_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1)),
+      npcs = new NPCs(npc_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1), maze),
+      enemies = new Enemies(enemy_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1), maze),
       background = {
-        width: map_size_lookup[level], height: map_size_lookup[level],
+        width: map_size_lookup[level]*2, height: map_size_lookup[level]*2,
         x_size: tile_size_lookup[level], y_size: tile_size_lookup[level],
         color: grid_backer,
         draw: function (context, interpolation) {
@@ -65,22 +71,24 @@ window.onload = () => {
       list.push(maze.tiles[key]);
     });
 
-    maze.reveal(1, 1, 5);
-    maze.visit(1, 1, 3);
+    maze.reveal(2, 2, 5);
+    maze.visit(2, 2, 3);
 
     list.push(start);
     list.push(end);
     list.push(player);
     list.push(...npcs.get_npcs());
+    list.push(...enemies.get_enemies());
 
-    player.x = 1;
-    player.y = 1;
+    player.x = 2;
+    player.y = 2;
 
     data.set('level', level);
     data.set('entity_list', list);
     data.set('player', player);
     data.set('npcs', npcs);
     data.set('grid', maze);
+    data.set('enemies', enemies);
   };
 
   next_map();
