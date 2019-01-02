@@ -30,41 +30,12 @@ class Player {
       ticks = this.creek.get('time').ticks,
       prev = null;
 
-    /*context.globalAlpha = 0.52;
-    for (let i = 0; i < this.previous.length; i++) {
-      x = this.previous[i][0];
-      y = this.previous[i][1];
-
-      prev = this.previous_check[this.get_key(x, y)];
-      if (!prev) continue;
-
-      if (!prev.drew_trail_at || ticks - prev.drew_trail_at > 2000) {
-        prev.color_index = prev.color_index === undefined ? 0 : (prev.color_index + 1) % this.palette.length;
-        prev.color = this.palette[prev.color_index]; // parseInt(Math.floor(Math.random()*this.palette.length))];
-        prev.drew_trail_at = ticks;
-        this.previous_check[this.get_key(x, y)] = prev;
-      }
-      context.fillStyle = prev.color;
-      size = 20-prev.size;
-      context.fillRect(x*this.x_size+size, y*this.y_size+size, this.x_size-size*2, this.y_size-size*2);
-    }
-    this.drew_trail_at = ticks;*/
-
-    context.globalAlpha = 1;
-    context.fillStyle = 'black';
-    context.fillRect(
-      this.x*this.x_size+6+2*(this.max_health-this.health),
-      this.y*this.y_size+6+2*(this.max_health-this.health),
-      this.x_size-(12+4*(this.max_health-this.health)),
-      this.y_size-(12+4*(this.max_health-this.health))
-    );
-    context.fillStyle = this.color;
-    context.fillRect(
-      this.x*this.x_size+8+2*(this.max_health-this.health),
-      this.y*this.y_size+8+2*(this.max_health-this.health),
-      this.x_size-(16+4*(this.max_health-this.health)),
-      this.y_size-(16+4*(this.max_health-this.health))
-    );
+    let player = this.creek.get('resources').get_image('player');
+    context.fillStyle = "red";
+    context.fillRect(this.x*this.x_size, (this.y)*this.y_size, this.x_size, 6);
+    context.fillStyle = "#00ff00";
+    context.fillRect(this.x*this.x_size, (this.y)*this.y_size, this.x_size*(this.health/this.max_health), 6);
+    context.drawImage(player.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
   }
 
   update(creek) {

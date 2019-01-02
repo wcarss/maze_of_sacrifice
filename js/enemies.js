@@ -7,7 +7,8 @@ class Enemies {
     return `${x}_${y}`;
   }
 
-  constructor (number, width, height, x_size, y_size, palette, maze) {
+  constructor (creek, number, width, height, x_size, y_size, palette, maze) {
+    this.creek = creek;
     this.enemies = [];
     this.number = number;
     this.dead = 0;
@@ -31,7 +32,7 @@ class Enemies {
         y = random_int(height-2)+1;
       }
       positions[this.get_key(x, y)] = true;
-      this.enemies.push(new Enemy(`enemy_${i}`, x, y, x_size, y_size, palette))
+      this.enemies.push(new Enemy(creek, `enemy_${i}`, x, y, x_size, y_size, palette))
       this.enemy_id_lookup[`enemy_${i}`] = this.enemies.length-1;
     }
   }
@@ -66,7 +67,8 @@ class Enemies {
 }
 
 class Enemy {
-  constructor (id, x, y, x_size, y_size, palette) {
+  constructor (creek, id, x, y, x_size, y_size, palette) {
+    this.creek = creek;
     this.id = id;
     this.x = x;
     this.y = y;
@@ -83,13 +85,12 @@ class Enemy {
 
   draw (context, interpolation) {
     if (this.active) {
-      context.fillStyle = this.color;
-      context.fillRect(
-        this.x*this.x_size+(8*(this.max_health-this.health)),
-        this.y*this.y_size+(8*(this.max_health-this.health)),
-        this.x_size-(16*(this.max_health-this.health)),
-        this.y_size-(16*(this.max_health-this.health))
-      );
+      let skeleton = this.creek.get('resources').get_image('skeleton');
+      context.fillStyle = "red";
+      context.fillRect(this.x*this.x_size, (this.y)*this.y_size, this.x_size, 6);
+      context.fillStyle = "#00ff00";
+      context.fillRect(this.x*this.x_size, (this.y)*this.y_size, this.x_size*(this.health/this.max_health), 6);
+      context.drawImage(skeleton.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
     }
   }
 

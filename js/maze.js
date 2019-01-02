@@ -15,7 +15,8 @@ class Maze {
     return `tile_${x}_${y}`;
   }
 
-  constructor(id, width, height, x_size, y_size, color) {
+  constructor(creek, id, width, height, x_size, y_size, color) {
+    this.creek = creek;
     this.id = id;
     this.tiles = {};
     this.cells = [];
@@ -77,7 +78,7 @@ class Maze {
 
     x = random_int(this.width-1)+1;
     y = random_int(this.height-1)+1;
-    tiles[get_key(x, y)] = new Tile(x, y, this.x_size, this.y_size, this.color); // palette[color_index]);
+    tiles[get_key(x, y)] = new Tile(this.creek, x, y, this.x_size, this.y_size, this.color); // palette[color_index]);
     cells.push([x, y]);
 
     while (cells.length > 0) {
@@ -132,7 +133,7 @@ class Maze {
     let new_tiles = {};
     for (let i = 1; i < this.width*2; i++) {
       for (let j = 1; j < this.height*2; j++) {
-        new_tiles[get_key(i, j)] = new NewTile(i, j, this.x_size, this.y_size, this.color, true);
+        new_tiles[get_key(i, j)] = new NewTile(this.creek, i, j, this.x_size, this.y_size, this.color, true);
       }
     }
 
@@ -228,7 +229,8 @@ class Tile {
     return `tile_${x}_${y}`;
   }
 
-  constructor(x, y, x_size, y_size, color) {
+  constructor(creek, x, y, x_size, y_size, color) {
+    this.creek = creek;
     this.id = this.get_key(x, y);
     this.x = x*x_size;
     this.y = y*y_size;
@@ -280,18 +282,19 @@ class Tile {
 }
 
 class NewTile extends Tile {
-  constructor (x, y, x_size, y_size, color, wall) {
-    super(x, y, x_size, y_size, color);
+  constructor (creek, x, y, x_size, y_size, color, wall) {
+    super(creek, x, y, x_size, y_size, color);
     this.wall = wall;
   }
 
   draw (context, interpolation) {
+    let tree = this.creek.get('resources').get_image('tree'),
+      grass = this.creek.get('resources').get_image('grass');
+
+    context.drawImage(grass.img, this.x, this.y, this.x_size, this.y_size);
     if (this.wall) {
-      context.fillStyle = "black";
-    } else {
-      context.fillStyle = this.color;
+      context.drawImage(tree.img, this.x, this.y, this.x_size, this.y_size);
     }
-    context.fillRect(this.x, this.y, this.x_size, this.y_size);
   }
 }
 

@@ -7,7 +7,8 @@ class NPCs {
     return `${x}_${y}`;
   }
 
-  constructor (number, width, height, x_size, y_size, palette, maze) {
+  constructor (creek, number, width, height, x_size, y_size, palette, maze) {
+    this.creek = creek;
     this.npcs = [];
     this.number = number;
     this.found = 0;
@@ -31,7 +32,7 @@ class NPCs {
         y = random_int(height-2)+1;
       }
       positions[this.get_key(x, y)] = true;
-      this.npcs.push(new NPC(`npc_${i}`, x, y, x_size, y_size, palette))
+      this.npcs.push(new NPC(creek, `npc_${i}`, x, y, x_size, y_size, palette))
       this.npc_id_lookup[`npc_${i}`] = this.npcs.length-1;
     }
   }
@@ -78,7 +79,8 @@ class NPCs {
 }
 
 class NPC {
-  constructor (id, x, y, x_size, y_size, palette) {
+  constructor (creek, id, x, y, x_size, y_size, palette) {
+    this.creek = creek;
     this.id = id;
     this.x = x;
     this.y = y;
@@ -90,9 +92,9 @@ class NPC {
   }
 
   draw (context, interpolation) {
+    let coin = this.creek.get('resources').get_image('coin');
     if (this.active) {
-      context.fillStyle = this.color;
-      context.fillRect(this.x*this.x_size+6, this.y*this.y_size+6, this.x_size-12, this.y_size-12);
+      context.drawImage(coin.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
     }
   }
 

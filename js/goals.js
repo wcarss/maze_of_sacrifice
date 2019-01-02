@@ -1,5 +1,6 @@
 class Start {
-  constructor (x, y, x_size, y_size, color) {
+  constructor (creek, x, y, x_size, y_size, color) {
+    this.creek = creek;
     this.x = x;
     this.y = y;
     this.x_size = x_size;
@@ -9,8 +10,10 @@ class Start {
   }
 
   draw (context, interpolation) {
-    context.fillStyle = this.color;
-    context.fillRect(this.x*this.x_size+4, this.y*this.y_size+4, this.x_size-8, this.y_size-8);
+    let grass = this.creek.get('resources').get_image('grass');
+    let temple = this.creek.get('resources').get_image('temple');
+    context.drawImage(grass.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
+    context.drawImage(temple.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
   }
 
   update (creek) {
@@ -19,7 +22,8 @@ class Start {
 };
 
 class End {
-  constructor (x, y, x_size, y_size, color) {
+  constructor (creek, x, y, x_size, y_size, color) {
+    this.creek = creek;
     this.x = x;
     this.y = y;
     this.x_size = x_size;
@@ -30,8 +34,10 @@ class End {
   }
 
   draw (context, interpolation) {
-    context.fillStyle = this.color;
-    context.fillRect(this.x*this.x_size+4, this.y*this.y_size+4, this.x_size-8, this.y_size-8);
+    let grass = this.creek.get('resources').get_image('grass');
+    let temple = this.creek.get('resources').get_image('temple');
+    context.drawImage(grass.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
+    context.drawImage(temple.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
   }
 
   update (creek) {

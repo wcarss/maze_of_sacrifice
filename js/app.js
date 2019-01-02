@@ -46,11 +46,11 @@ window.onload = () => {
 
     let grid_backer = palette.pop(),
       list = [],
-      start = new Start(2, 2, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
-      end = new End((map_size_lookup[level]-1)*2, (map_size_lookup[level]-1)*2, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
-      maze = new Maze(`maze_${level}`, map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], grid_backer),
-      npcs = new NPCs(npc_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1), maze),
-      enemies = new Enemies(enemy_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1), maze),
+      start = new Start(creek, 2, 2, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
+      end = new End(creek, (map_size_lookup[level]-1)*2, (map_size_lookup[level]-1)*2, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
+      maze = new Maze(creek, `maze_${level}`, map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], grid_backer),
+      npcs = new NPCs(creek, npc_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1), maze),
+      enemies = new Enemies(creek, enemy_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1), maze),
       background = {
         width: map_size_lookup[level]*2, height: map_size_lookup[level]*2,
         x_size: tile_size_lookup[level], y_size: tile_size_lookup[level],
@@ -146,6 +146,33 @@ window.onload = () => {
   	}
   ])*/
 
+  class CreekImage {
+    constructor(id, width, height, url, source_x, source_y, source_width, source_height) {
+      this.id = id;
+      this.width = width;
+      this.height = height;
+      this.url = url || `resources/images/${id}.png`;
+      this.source_x = source_x || 0;
+      this.source_y = source_y || 0;
+      this.source_width = source_width || width;
+      this.source_height = source_height || height;
+    }
+
+    get() {
+      return {
+        "type": "image",
+        "url": this.url,
+        "id": this.id,
+        "source_x": this.source_x,
+        "source_y": this.source_y,
+        "source_width": this.source_width,
+        "source_height": this.source_height,
+        "width": this.width,
+        "height": this.height,
+      };
+    }
+  }
+
   class Sound {
     constructor(id, url, muted, volume, looping) {
       url = url || `resources/sounds/${id}.wav`;
@@ -198,17 +225,37 @@ window.onload = () => {
     new Sound("bwuh_2").get(),
     new Sound("bwuh_low").get(),
     new Sound("cave_hopping", "resources/sounds/cave_hopping_longer.mp3", false, 0.6, true).get(),
-    {
-      "type": "image",
-      "url": "resources/images/player.png",
-      "id": "player",
-      "source_x": 0,
-      "source_y": 5,
-      "source_width": 26,
-      "source_height": 26,
-      "width": 26,
-      "height": 32,
-    }
+    new CreekImage("player", 26, 32, "resources/images/player.png", 0, 5, 26, 26).get(),
+    new CreekImage("player", 32, 32).get(),
+    new CreekImage("temple", 32, 32, "resources/images/tileset.png", 368, 192, 16, 16).get(),
+    new CreekImage("coin", 32, 32, "resources/images/coin.png", 0, 0, 48, 48).get(),
+    new CreekImage("reticle_black", 32, 32).get(),
+    new CreekImage("reticle_red", 32, 32).get(),
+    new CreekImage("reticle_green", 32, 32).get(),
+    new CreekImage("grass", 32, 32, "resources/images/tileset.png", 303, 48, 16, 16).get(),
+    new CreekImage("brush", 32, 32, "resources/images/tileset.png", 64, 159, 16, 16).get(),
+    new CreekImage("dirt", 32, 32, "resources/images/tileset.png", 352, 48, 16, 16).get(),
+    new CreekImage("mountains", 32, 32, "resources/images/tileset.png", 64, 224, 16, 16).get(),
+    new CreekImage("pave_stone", 32, 32, "resources/images/tileset.png", 208, 80, 16, 16).get(),
+    new CreekImage("purple_walk_1", 32, 32, "resources/images/tileset.png", 192, 0, 16, 16).get(),
+    new CreekImage("purple_walk_2", 32, 32, "resources/images/tileset.png", 192, 16, 16, 16).get(),
+    new CreekImage("purple_walk_3", 32, 32, "resources/images/tileset.png", 208, 0, 16, 16).get(),
+    new CreekImage("purple_walk_4", 32, 32, "resources/images/tileset.png", 208, 16, 16, 16).get(),
+    new CreekImage("sand", 32, 32, "resources/images/tileset.png", 160, 32, 16, 16).get(),
+    new CreekImage("snow", 32, 32, "resources/images/tileset.png", 304, 96, 16, 16).get(),
+    new CreekImage("tree", 32, 32, "resources/images/tileset.png", 304, 128, 16, 16).get(),
+    new CreekImage("trees", 32, 32, "resources/images/tileset.png", 16, 224, 16, 16).get(),
+    new CreekImage("water", 32, 32, "resources/images/tileset.png", 16, 64, 16, 16).get(),
+    new CreekImage("barrell", 32, 32, "resources/images/tileset.png", 400, 144, 16, 16).get(),
+    new CreekImage("bush", 32, 32, "resources/images/tileset.png", 288, 144, 16, 16).get(),
+    new CreekImage("dead_tree", 32, 32, "resources/images/tileset.png", 320, 128, 16, 16).get(),
+    new CreekImage("treasure", 32, 32, "resources/images/tileset.png", 448, 16, 16, 16).get(),
+    new CreekImage("gravel", 32, 32, "resources/images/tileset.png", 192, 128, 16, 16).get(),
+    new CreekImage("hill", 32, 32, "resources/images/tileset.png", 48, 192, 16, 16).get(),
+    new CreekImage("shards", 32, 32, "resources/images/tileset.png", 432, 48, 16, 16).get(),
+    new CreekImage("small_tree", 32, 32, "resources/images/tileset.png", 0, 192, 16, 16).get(),
+    new CreekImage("stump", 32, 32, "resources/images/tileset.png", 336, 128, 16, 16).get(),
+    new CreekImage("skeleton", 32, 32, "resources/images/dragon_warrior_monsters.png", 24, 202, 24, 24).get(),
   ];
 
   creek.get('resources').init(creek, resources).then(() => {
