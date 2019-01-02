@@ -94,7 +94,7 @@ class NPC {
   draw (context, interpolation) {
     if (this.active) {
       let coin = this.creek.get('resources').get_image('coin'),
-        maze = this.creek.get('data').get('grid'),
+        maze = this.creek.get('data').get('maze'),
         tile = maze.tiles[maze.get_key(this.x, this.y)];
       if (tile.visited || tile.revealed) {
         context.drawImage(coin.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);

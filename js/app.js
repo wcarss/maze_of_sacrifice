@@ -20,80 +20,122 @@ window.onload = () => {
 
   document.getElementsByTagName('body')[0].setAttribute('style', 'background: grey');
 
-  let next_map = function () {
-    const data = creek.get('data');
+  let old_map_size_lookup = {
+      1: 6, 2: 6, 3: 8, 4: 8, 5: 8, 6: 10, 7: 10, 8: 10, 9: 14, 10: 14, 11: 14, 12: 14,
+    },
+    old_tile_size_lookup = {
+      1: 60, 2: 60, 3: 50, 4: 50, 5: 50, 6: 40, 7: 40, 8: 40, 9: 24, 10: 24, 11: 24, 12: 24
+    },
+    old_npc_count_lookup = {
+      1: 2, 2: 2, 3: 2, 4: 4, 5: 6, 6: 4, 7: 6, 8: 6, 9: 8, 10: 8, 11: 16, 12: 16
+    },
+    map_size_lookup  =   [4,  6,  6,  6,  6,  8,  8,  8,  8, 10, 10, 10, 14],
+    tile_size_lookup =   [60, 60, 60, 60, 60, 50, 50, 50, 50, 40, 40, 40, 24],
+    npc_count_lookup =   [1,  2,  2,  2,  2,  4,  4,  4,  4,  4,  6,  6,  8],
+    enemy_count_lookup = [0,  1,  1,  2,  2,  2,  4,  6,  6,  6,  8, 10, 12];
+
+
+  let make_map = function (id, tile_size, map_size, npc_count, enemy_count) {
     let seed = Math.random()*200 | 0,
-      palette = get_palette(seed),
-      level = (data.get('level') || 0) + 1,
-      old_map_size_lookup = {
-        1: 6, 2: 6, 3: 8, 4: 8, 5: 8, 6: 10, 7: 10, 8: 10, 9: 14, 10: 14, 11: 14, 12: 14,
-      },
-      old_tile_size_lookup = {
-        1: 60, 2: 60, 3: 50, 4: 50, 5: 50, 6: 40, 7: 40, 8: 40, 9: 24, 10: 24, 11: 24, 12: 24
-      },
-      old_npc_count_lookup = {
-        1: 2, 2: 2, 3: 2, 4: 4, 5: 6, 6: 4, 7: 6, 8: 6, 9: 8, 10: 8, 11: 16, 12: 16
-      },
-      map_size_lookup  =   [0,  6,  6,  6,  6,  8,  8,  8,  8, 10, 10, 10, 14],
-      tile_size_lookup =   [0, 60, 60, 60, 60, 50, 50, 50, 50, 40, 40, 40, 24],
-      npc_count_lookup =   [0,  2,  2,  2,  2,  4,  4,  4,  4,  4,  6,  6,  8],
-      enemy_count_lookup = [0,  1,  1,  2,  2,  2,  4,  6,  6,  6,  8, 10, 12];
+      palette = get_palette(seed);
 
     console.log(`Seed: ${seed} and palette id: ${Square.get_palette_id(seed)}`);
     console.log(palette);
 
-    let player = data.get('player') || new Player(creek, 2, 2, tile_size_lookup[level], tile_size_lookup[level], palette.slice(0, 1), palette.slice(1));
-
     let grid_backer = palette.pop(),
-      list = [],
-      start = new Start(creek, 2, 2, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
-      end = new End(creek, (map_size_lookup[level]-1)*2, (map_size_lookup[level]-1)*2, tile_size_lookup[level], tile_size_lookup[level], palette[1]),
-      maze = new Maze(creek, `maze_${level}`, map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], grid_backer),
-      npcs = new NPCs(creek, npc_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1), maze),
-      enemies = new Enemies(creek, enemy_count_lookup[level], map_size_lookup[level], map_size_lookup[level], tile_size_lookup[level], tile_size_lookup[level], palette.slice(1), maze),
-      background = {
-        width: map_size_lookup[level]*2, height: map_size_lookup[level]*2,
-        x_size: tile_size_lookup[level], y_size: tile_size_lookup[level],
-        color: grid_backer,
-        draw: function (context, interpolation) {
-          context.fillStyle = this.color,
-          context.fillRect(this.x_size, this.y_size, (this.width-1)*this.x_size, (this.height-1)*this.y_size);
-        },
-        update: function (creek) {}
-      }
+      entity_list = [],
+      start = new Start(creek, 2, 2, tile_size, tile_size, palette[1]),
+      end = new End(creek, (map_size-1)*2, (map_size-1)*2, tile_size, tile_size, palette[1]),
+      maze = new Maze(creek, `maze_${id}`, map_size, map_size, tile_size, tile_size, grid_backer),
+      npcs = new NPCs(creek, npc_count, map_size, map_size, tile_size, tile_size, palette.slice(1), maze),
+      enemies = new Enemies(creek, enemy_count, map_size, map_size, tile_size, tile_size, palette.slice(1), maze);
 
-    player.x_size = tile_size_lookup[level];
-    player.y_size = tile_size_lookup[level];
-    player.color = palette[0];
-
-    list.push(background);
     Object.keys(maze.tiles).forEach(key => {
-      list.push(maze.tiles[key]);
+      entity_list.push(maze.tiles[key]);
     });
 
     maze.reveal(2, 2, 3);
     maze.visit(2, 2, 2);
     maze.reveal(1, 1, 0);
 
-    list.push(start);
-    list.push(end);
-    list.push(...npcs.get_npcs());
-    list.push(...enemies.get_enemies());
-    list.push(player);
+    entity_list.push(start);
+    entity_list.push(end);
+    entity_list.push(...npcs.get_npcs());
+    entity_list.push(...enemies.get_enemies());
 
-    player.x = 2;
-    player.y = 2;
+    return {
+      'id': id,
+      'entity_list': entity_list,
+      'player': null,
+      'npcs': npcs,
+      'maze': maze,
+      'enemies': enemies,
+      'setup_player': function (player, player_x, player_y) {
+        player.x = player_x || 2;
+        player.y = player_y || 2;
+        player.last_x = null;
+        player.last_y = null;
+        player.last_hdir = null;
+        player.last_vdir = null;
+        player.x_size = tile_size;
+        player.y_size = tile_size;
+        this.player = player;
+        this.entity_list.push(player);
+      }
+    };
+  },
+  change_map = function(map_id, creek, player_x, player_y) {
+     let data = creek.get('data'),
+       time = creek.get('time'),
+       map = data.get('maps')[map_id],
+       player = data.get('player'),
+       last_map_change = data.get('last_map_change');
 
-    data.set('level', level);
-    data.set('entity_list', list);
-    data.set('player', player);
-    data.set('npcs', npcs);
-    data.set('grid', maze);
-    data.set('enemies', enemies);
+     if (last_map_change && time.ticks - last_map_change < 500) {
+       return;
+     }
+
+     if (!map) {
+       console.log("map not found!");
+       debugger;
+     }
+
+     map.setup_player(player, player_x, player_y);
+
+     data.set('last_map_change', time.ticks);
+     data.set('current_map', map.id);
+     data.set('entity_list', map.entity_list);
+     data.set('npcs', map.npcs);
+     data.set('maze', map.maze);
+     data.set('enemies', map.enemies);
+     data.set('player', map.player);
+  },
+  make_map_id = function(id) {
+    return `map_${id}`;
   };
 
-  next_map();
-  creek.get('data').set('next_map', next_map);
+
+  let num_of_maps = 12, maps = {}, map = null;
+  for (let i = 0; i <= num_of_maps; i++) {
+    map = make_map(make_map_id(i), tile_size_lookup[i], map_size_lookup[i], npc_count_lookup[i], enemy_count_lookup[i]);
+    map.last_map_id = make_map_id(i-1);
+    map.next_map_id = make_map_id(i+1);
+    maps[map.id] = map;
+
+    if (i === 0) {
+      map.last_map_id = null;
+    }
+
+    if (i === num_of_maps) {
+      map.next_map_id = make_map_id(0);
+    }
+  }
+
+  let player = new Player(creek, 2, 2, 32, 32, null, null);
+  creek.get('data').set('player', player);
+  creek.get('data').set('maps', maps);
+  creek.get('data').set('change_map', change_map);
+  change_map(make_map_id(0), creek);
 
   // really good one: seed&palette 172
 

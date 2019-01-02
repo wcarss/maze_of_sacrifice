@@ -41,18 +41,20 @@ class Player {
   update(creek) {
     const time = creek.get('time'),
       controls = creek.get('controls'),
-      grid = creek.get('data').get('grid'),
+      maze = creek.get('data').get('maze'),
       enemies = creek.get('data').get('enemies'),
-      key = grid.get_key,
-      tile = grid.tiles[key(this.x, this.y)],
-      n  = grid.tiles[key(this.x, this.y-1)],
-      s  = grid.tiles[key(this.x, this.y+1)],
-      e  = grid.tiles[key(this.x+1, this.y)],
-      w  = grid.tiles[key(this.x-1, this.y)],
-      nw = grid.tiles[key(this.x-1, this.y-1)],
-      ne = grid.tiles[key(this.x+1, this.y-1)],
-      sw = grid.tiles[key(this.x-1, this.y+1)],
-      se = grid.tiles[key(this.x+1, this.y+1)];
+      key = maze.get_key,
+      tile = maze.tiles[key(this.x, this.y)],
+      n  = maze.tiles[key(this.x, this.y-1)],
+      s  = maze.tiles[key(this.x, this.y+1)],
+      e  = maze.tiles[key(this.x+1, this.y)],
+      w  = maze.tiles[key(this.x-1, this.y)],
+      nw = maze.tiles[key(this.x-1, this.y-1)],
+      ne = maze.tiles[key(this.x+1, this.y-1)],
+      sw = maze.tiles[key(this.x-1, this.y+1)],
+      se = maze.tiles[key(this.x+1, this.y+1)];
+
+    if (!n) debugger;
 
     let new_x = this.x,
       new_y = this.y,
@@ -158,12 +160,12 @@ class Player {
     this.x = new_x;
     this.y = new_y;
 
-    grid.visit(this.x, this.y, 1, true);
-    grid.reveal(this.x, this.y, 3);
-    grid.reveal(this.x-1, this.y-1, 0);
-    grid.reveal(this.x+1, this.y-1, 0);
-    grid.reveal(this.x-1, this.y+1, 0);
-    grid.reveal(this.x+1, this.y+1, 0);
+    maze.visit(this.x, this.y, 1, true);
+    maze.reveal(this.x, this.y, 3);
+    maze.reveal(this.x-1, this.y-1, 0);
+    maze.reveal(this.x+1, this.y-1, 0);
+    maze.reveal(this.x-1, this.y+1, 0);
+    maze.reveal(this.x+1, this.y+1, 0);
 
     this.moved_at = time.ticks;
   }

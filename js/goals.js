@@ -17,7 +17,19 @@ class Start {
   }
 
   update (creek) {
+    const data = creek.get('data'),
+      player = data.get('player'),
+      current_map_id = data.get('current_map'),
+      current_map = data.get('maps')[current_map_id],
+      last_map_id = current_map.last_map_id;
 
+    if (last_map_id && player.x === this.x && player.y === this.y && (player.last_x && player.last_y)) {
+      creek.get('context').get().clearRect(0, 0, creek.get('context').get_width(), creek.get('context').get_height());
+      creek.get('audio').play('level');
+      current_map.exit_x = this.x;
+      current_map.exit_y = this.y;
+      data.get('change_map')(last_map_id, creek, data.get('maps')[last_map_id].exit_x, data.get('maps')[last_map_id].exit_y);
+    }
   }
 };
 
@@ -41,16 +53,21 @@ class End {
   }
 
   update (creek) {
-    const player = creek.get('data').get('player');
-    if (player.x === this.x && player.y === this.y) {
-      player.previous_check = {};
-      player.previous = [];
-      if (creek.get('data').get('level') >= this.last_level) {
-        creek.get('data').set('level', 0);
-      }
+    const data = creek.get('data'),
+      player = data.get('player'),
+      current_map_id = data.get('current_map'),
+      current_map = data.get('maps')[current_map_id],
+      next_map_id = current_map.next_map_id;
+
+    if (player.x === this.x && player.y === this.y && (player.last_x && player.last_y)) {
       creek.get('context').get().clearRect(0, 0, creek.get('context').get_width(), creek.get('context').get_height());
       creek.get('audio').play('level');
-      creek.get('data').get('next_map')();
+      current_map.exit_x = this.x;
+      current_map.exit_y = this.y;
+      if (next_map_id === 'map_0') {
+        data.get('maps')[next_map_id].last_map_id = current_map_id;
+      }
+      data.get('change_map')(next_map_id, creek);
     }
   }
 };

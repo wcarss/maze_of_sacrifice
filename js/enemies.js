@@ -85,7 +85,7 @@ class Enemy {
 
   draw (context, interpolation) {
     let skeleton = this.creek.get('resources').get_image('skeleton'),
-      maze = this.creek.get('data').get('grid'),
+      maze = this.creek.get('data').get('maze'),
       tile = maze.tiles[maze.get_key(this.x, this.y)];
 
     if (this.active) {
@@ -125,7 +125,7 @@ class Enemy {
   update (creek) {
     const time = creek.get('time'),
       player = creek.get('data').get('player'),
-      maze = creek.get('data').get('grid'),
+      maze = creek.get('data').get('maze'),
       key = maze.get_key;
 
     if (!this.active) return;
@@ -150,6 +150,9 @@ class Enemy {
         if (player.y < this.y) this.y -= 1;
       }
 
+      if (!maze.tiles[key(this.x, this.y)]) {
+        debugger;
+      }
       if (maze.tiles[key(this.x, this.y)].wall) {
         this.x = this.last_x;
         this.y = this.last_y;
