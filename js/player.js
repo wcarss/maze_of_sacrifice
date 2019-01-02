@@ -72,7 +72,19 @@ class Player {
       creek.get('audio').play('slash');
     }
 
-    if ((!hdir && !vdir) && navigator.maxTouchPoints !== 0) {
+    if (controls.check_key('ArrowUp')) {
+      vdir = 'n';
+    } else if (controls.check_key('ArrowDown')) {
+      vdir = 's';
+    }
+
+    if (controls.check_key('ArrowLeft')) {
+      hdir = 'w';
+    } else if (controls.check_key('ArrowRight')) {
+      hdir = 'e';
+    }
+
+    if (navigator.maxTouchPoints !== 0) {
       let mouse = controls.get_mouse();
       let context = creek.get('context'),
         width = context.get_width(),
@@ -82,44 +94,38 @@ class Player {
         top_third_x = width-third_x,
         top_third_y = height-third_y;
 
-      if (mouse.pressed) {
-        if (mouse.x < third_x && !w.wall) {
-          vdir = 'w';
-          new_x = this.x - move_distance;
-        } else if (mouse.x > top_third_x && !e.wall) {
-          vdir = 'e';
-          new_x = this.x + move_distance;
-        }
-
-        if (mouse.y < third_y && !n.wall) {
-          hdir = 'n';
-          new_y = this.y - move_distance;
-        } else if (mouse.y > top_third_y && !s.wall) {
-          hdir = 's';
-          new_y = this.y + move_distance;
-        }
-      }
-    } else if (!hdir && !vdir) {
-      if (controls.check_key('ArrowUp') && !n.wall) {
-        vdir = 'n';
-        new_y = this.y - move_distance;
-      } else if (controls.check_key('ArrowDown') && !s.wall) {
-        vdir = 's';
-        new_y = this.y + move_distance;
+      if (!mouse.pressed) {
+        return;
       }
 
-      if (controls.check_key('ArrowLeft') && !w.wall) {
+      if (mouse.x < third_x) {
         hdir = 'w';
-        new_x = this.x - move_distance;
-      } else if (controls.check_key('ArrowRight') && !e.wall) {
+      } else if (mouse.x > top_third_x) {
         hdir = 'e';
-        new_x = this.x + move_distance;
+      }
+
+      if (mouse.y < third_y) {
+        vdir = 'n';
+      } else if (mouse.y > top_third_y) {
+        vdir = 's';
       }
     }
 
     if (vdir === null && hdir === null) {
       return;
       this.wait_time = this.default_wait_time;
+    }
+
+    if (hdir === 'w' && !w.wall) {
+      new_x = this.x - move_distance;
+    } else if (hdir ==='e' && !e.wall) {
+      new_x = this.x + move_distance;
+    }
+
+    if (vdir === 'n' && !n.wall) {
+      new_y = this.y - move_distance;
+    } else if (vdir === 's' && !s.wall) {
+      new_y = this.y + move_distance;
     }
 
     if (vdir === 'n') {
@@ -145,13 +151,8 @@ class Player {
       this.wait_time = this.default_wait_time;
     }
 
-    if (vdir) {
-      this.last_vdir = vdir;
-    }
-    if (hdir) {
-      this.last_hdir = hdir;
-    }
-
+    this.last_vdir = vdir;
+    this.last_hdir = hdir;
     this.last_x = this.x;
     this.last_y = this.y;
     this.x = new_x;
