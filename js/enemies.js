@@ -84,13 +84,30 @@ class Enemy {
   }
 
   draw (context, interpolation) {
+    let skeleton = this.creek.get('resources').get_image('skeleton'),
+      maze = this.creek.get('data').get('grid'),
+      tile = maze.tiles[maze.get_key(this.x, this.y)];
+
     if (this.active) {
-      let skeleton = this.creek.get('resources').get_image('skeleton');
+      skeleton = this.creek.get('resources').get_image('skeleton');
+    } else {
+      skeleton = this.creek.get('resources').get_image('bones');
+    }
+
+    if (tile.visited && this.active) {
       context.fillStyle = "red";
       context.fillRect(this.x*this.x_size, (this.y)*this.y_size, this.x_size, 6);
       context.fillStyle = "#00ff00";
       context.fillRect(this.x*this.x_size, (this.y)*this.y_size, this.x_size*(this.health/this.max_health), 6);
+    }
+    if (tile.visited || tile.revealed) {
       context.drawImage(skeleton.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
+    }
+    if (!tile.visited && tile.revealed) {
+      context.globalAlpha = 0.3;
+      context.fillStyle = "black";
+      context.fillRect(this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
+      context.globalAlpha = 1;
     }
   }
 

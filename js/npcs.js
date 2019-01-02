@@ -92,9 +92,19 @@ class NPC {
   }
 
   draw (context, interpolation) {
-    let coin = this.creek.get('resources').get_image('coin');
     if (this.active) {
-      context.drawImage(coin.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
+      let coin = this.creek.get('resources').get_image('coin'),
+        maze = this.creek.get('data').get('grid'),
+        tile = maze.tiles[maze.get_key(this.x, this.y)];
+      if (tile.visited || tile.revealed) {
+        context.drawImage(coin.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
+      }
+      if (!tile.visited && tile.revealed) {
+        context.globalAlpha = 0.3;
+        context.fillStyle = "black";
+        context.fillRect(this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
+        context.globalAlpha = 1;
+      }
     }
   }
 

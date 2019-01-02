@@ -181,46 +181,30 @@ class Maze {
 
     tile.visited = true;
 
-    if (n < 1) {
+    if (n < 1 || tile.wall) {
       return;
     }
 
-    if (!tile.walls.n) {
-      this.visit(x, y-1, n-1);
-    }
-    if (!tile.walls.s) {
-      this.visit(x, y+1, n-1);
-    }
-    if (!tile.walls.e) {
-      this.visit(x+1, y, n-1);
-    }
-    if (!tile.walls.w) {
-      this.visit(x-1, y, n-1);
-    }
+    this.visit(x, y-1, n-1);
+    this.visit(x, y+1, n-1);
+    this.visit(x+1, y, n-1);
+    this.visit(x-1, y, n-1);
   }
 
   reveal(x, y, n) {
     let tile = this.tiles[this.get_key(x, y)];
-    if (!tile) debugger;
+    if (!tile) return;
     tile.revealed = true;
     tile.dirty = true;
 
-    if (n < 1) {
+    if (n < 1 || tile.wall) {
       return;
     }
 
-    if (!tile.walls.n) {
-      this.reveal(x, y-1, n-1);
-    }
-    if (!tile.walls.s) {
-      this.reveal(x, y+1, n-1);
-    }
-    if (!tile.walls.e) {
-      this.reveal(x+1, y, n-1);
-    }
-    if (!tile.walls.w) {
-      this.reveal(x-1, y, n-1);
-    }
+    this.reveal(x, y-1, n-1);
+    this.reveal(x, y+1, n-1);
+    this.reveal(x+1, y, n-1);
+    this.reveal(x-1, y, n-1);
   }
 }
 
@@ -294,6 +278,16 @@ class NewTile extends Tile {
     context.drawImage(grass.img, this.x, this.y, this.x_size, this.y_size);
     if (this.wall) {
       context.drawImage(tree.img, this.x, this.y, this.x_size, this.y_size);
+    }
+    if (!this.visited) {
+      context.fillStyle = "black";
+      if (this.revealed) {
+        context.globalAlpha = 0.6;
+      }
+      context.fillRect(this.x, this.y, this.x_size, this.y_size);
+      if (this.revealed) {
+        context.globalAlpha = 1;
+      }
     }
   }
 }

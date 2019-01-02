@@ -66,40 +66,11 @@ class Player {
       creek.get('data').set('game_running', false);
     }
 
-    if (controls.check_key('Space') && (!this.attacked_at || (time.ticks - this.attacked_at > 500))) {
+    if (controls.check_key('Space') && (!this.attacked_at || (time.ticks - this.attacked_at > 350))) {
       this.attacked_at = time.ticks;
       enemies.give_damage_xy(this.x, this.y);
-      this.last_color = this.color;
-      this.color = "white";
       creek.get('audio').play('bwuh_low');
-    } else if (this.last_color) {
-      this.color = this.last_color;
-      this.last_color = null;
     }
-
-/* for ice-world/sliding puzzle style
- *
- * if (this.last_hdir === 'w' && !w.wall) {
-      hdir = 'w';
-      new_x = this.x - move_distance;
-      this.last_vdir = null;
-    } else if (this.last_hdir === 'e' && !e.wall) {
-      hdir = 'e';
-      new_x = this.x + move_distance;
-      this.last_vdir = null;
-    }
-
-    if (this.last_vdir === 'n' && !n.wall) {
-      vdir = 'n';
-      new_y = this.y - move_distance;
-      this.last_hdir = null;
-    } else if (this.last_vdir === 's' && !s.wall) {
-      vdir = 's';
-      new_y = this.y + move_distance;
-      this.last_hdir = null;
-    }
-  *
-  */
 
     if ((!hdir && !vdir) && navigator.maxTouchPoints !== 0) {
       let mouse = controls.get_mouse();
@@ -163,23 +134,8 @@ class Player {
       }
     }
 
-/* for ice-world/sliding movement idea -- allows to place blocks w/ shift+direction
- *
- * if (controls.check_key('ShiftLeft')) {
-      this.last_vdir = null;
-      this.last_hdir = null;
-
-      if (!this.moved_at || ((time.ticks - this.moved_at) < 200)) {
-        this.moved_at = time.ticks;
-        return;
-      }
-
-      this.moved_at = time.ticks;
-      tile.wall = true;
-    }
-*/
     if (((this.last_vdir || this.last_hdir) && this.moved_at) && (time.ticks - this.moved_at < this.wait_time)) {
-      // don't move more than once / 40ms in the same direction
+      // don't move more than once / wait time ms in the same direction
       return;
     }
 
@@ -196,31 +152,18 @@ class Player {
       this.last_hdir = hdir;
     }
 
-    grid.visit(this.x, this.y, 2, true);
-    grid.reveal(this.x, this.y, 8);
-
     this.last_x = this.x;
     this.last_y = this.y;
     this.x = new_x;
     this.y = new_y;
 
-    if (this.last_x !== this.x || this.last_y !== this.y) {
-      prev_check = this.previous_check[this.get_key(this.x, this.y)];
-      if (prev_check === undefined || prev_check.removed) {
-        this.previous.push([this.x, this.y]);
-        prev_check = {size: (prev_check && prev_check.size) || 13, color: null};
-        if (this.previous.length > this.followers) {
-          this.previous.shift();
-          prev_check.removed = true;
-        }
-      } else {
-        this.previous.push(this.previous.shift());
-        //if (prev_check.size > 6) {
-        //  prev_check.size -= 2;
-        //}
-      }
-      this.previous_check[this.get_key(this.x, this.y)] = prev_check;
-    }
+    grid.visit(this.x, this.y, 1, true);
+    grid.reveal(this.x, this.y, 3);
+    grid.reveal(this.x-1, this.y-1, 0);
+    grid.reveal(this.x+1, this.y-1, 0);
+    grid.reveal(this.x-1, this.y+1, 0);
+    grid.reveal(this.x+1, this.y+1, 0);
+
     this.moved_at = time.ticks;
   }
 }

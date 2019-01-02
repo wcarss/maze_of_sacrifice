@@ -71,14 +71,15 @@ window.onload = () => {
       list.push(maze.tiles[key]);
     });
 
-    maze.reveal(2, 2, 5);
-    maze.visit(2, 2, 3);
+    maze.reveal(2, 2, 3);
+    maze.visit(2, 2, 2);
+    maze.reveal(1, 1, 0);
 
     list.push(start);
     list.push(end);
-    list.push(player);
     list.push(...npcs.get_npcs());
     list.push(...enemies.get_enemies());
+    list.push(player);
 
     player.x = 2;
     player.y = 2;
@@ -226,7 +227,6 @@ window.onload = () => {
     new Sound("bwuh_2").get(),
     new Sound("bwuh_low").get(),
     new Sound("cave_hopping", "resources/sounds/cave_hopping_longer.mp3", false, 0.6, true).get(),
-    new CreekImage("player", 26, 32, "resources/images/player.png", 0, 5, 26, 26).get(),
     new CreekImage("player", 32, 32).get(),
     new CreekImage("temple", 32, 32, "resources/images/tileset.png", 368, 192, 16, 16).get(),
     new CreekImage("coin", 32, 32, "resources/images/coin.png", 0, 0, 48, 48).get(),
@@ -256,6 +256,7 @@ window.onload = () => {
     new CreekImage("shards", 32, 32, "resources/images/tileset.png", 432, 48, 16, 16).get(),
     new CreekImage("small_tree", 32, 32, "resources/images/tileset.png", 0, 192, 16, 16).get(),
     new CreekImage("stump", 32, 32, "resources/images/tileset.png", 336, 128, 16, 16).get(),
+    new CreekImage("bones", 32, 32, "resources/images/tileset.png", 448, 48, 16, 16).get(),
     new CreekImage("skeleton", 32, 32, "resources/images/dragon_warrior_monsters.png", 24, 202, 24, 24).get(),
   ];
 
