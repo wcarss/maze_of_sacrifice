@@ -69,7 +69,7 @@ class Player {
     if (controls.check_key('Space') && (!this.attacked_at || (time.ticks - this.attacked_at > 350))) {
       this.attacked_at = time.ticks;
       enemies.give_damage_xy(this.x, this.y);
-      creek.get('audio').play('bwuh_low');
+      creek.get('audio').play('slash');
     }
 
     if ((!hdir && !vdir) && navigator.maxTouchPoints !== 0) {

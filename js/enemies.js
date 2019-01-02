@@ -118,6 +118,7 @@ class Enemy {
 
   give_damage() {
     console.log(`${this.id} takes 1 damage, health is ${this.health}`);
+    this.creek.get('audio').play('bwuh_low');
     this.health -= 1;
   }
 

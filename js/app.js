@@ -226,6 +226,7 @@ window.onload = () => {
     new Sound("bwuh").get(),
     new Sound("bwuh_2").get(),
     new Sound("bwuh_low").get(),
+    new Sound("slash").get(),
     new Sound("cave_hopping", "resources/sounds/cave_hopping_longer.mp3", false, 0.6, true).get(),
     new CreekImage("player", 32, 32).get(),
     new CreekImage("temple", 32, 32, "resources/images/tileset.png", 368, 192, 16, 16).get(),
