@@ -15,7 +15,7 @@ class Maze {
     return `tile_${x}_${y}`;
   }
 
-  constructor(creek, id, width, height, x_size, y_size, color) {
+  constructor(creek, id, width, height, size) {
     this.creek = creek;
     this.id = id;
     this.tiles = {};
@@ -41,9 +41,8 @@ class Maze {
     };
     this.width = width;
     this.height = height;
-    this.x_size = x_size;
-    this.y_size = y_size;
-    this.color = color;
+    this.x_size = size;
+    this.y_size = size;
     this.generate();
   }
 
@@ -74,11 +73,10 @@ class Maze {
       opposite = this.opposite,
       cells = this.cells,
       tiles = this.tiles;
-      // color_index = random_int(palette.length);
 
     x = random_int(this.width-1)+1;
     y = random_int(this.height-1)+1;
-    tiles[get_key(x, y)] = new Tile(this.creek, x, y, this.x_size, this.y_size, this.color); // palette[color_index]);
+    tiles[get_key(x, y)] = new Tile(this.creek, x, y, this.x_size);
     cells.push([x, y]);
 
     while (cells.length > 0) {
@@ -104,7 +102,6 @@ class Maze {
 
       if (index !== null) {
         cells.splice(index, 1);
-        // color_index = (color_index + 1) % palette.length;
       }
     }
 
@@ -133,7 +130,7 @@ class Maze {
     let new_tiles = {};
     for (let i = 1; i < this.width*2; i++) {
       for (let j = 1; j < this.height*2; j++) {
-        new_tiles[get_key(i, j)] = new NewTile(this.creek, i, j, this.x_size, this.y_size, this.color, true);
+        new_tiles[get_key(i, j)] = new NewTile(this.creek, i, j, this.x_size, true);
       }
     }
 
@@ -213,13 +210,13 @@ class Tile {
     return `tile_${x}_${y}`;
   }
 
-  constructor(creek, x, y, x_size, y_size, color) {
+  constructor(creek, x, y, size) {
     this.creek = creek;
     this.id = this.get_key(x, y);
-    this.x = x*x_size;
-    this.y = y*y_size;
-    this.x_size = x_size;
-    this.y_size = y_size;
+    this.x = x*size;
+    this.y = y*size;
+    this.x_size = size;
+    this.y_size = size;
     this.firstVisit = true;
     this.dirty = true;
     this.visited = false;
@@ -230,7 +227,6 @@ class Tile {
       e: true,
       w: true
     };
-    this.color = color // palette[random_int(palette.length)];
     this.layer = 2;
   }
 
@@ -266,8 +262,8 @@ class Tile {
 }
 
 class NewTile extends Tile {
-  constructor (creek, x, y, x_size, y_size, color, wall) {
-    super(creek, x, y, x_size, y_size, color);
+  constructor (creek, x, y, size, wall) {
+    super(creek, x, y, size);
     this.wall = wall;
   }
 

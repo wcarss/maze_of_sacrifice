@@ -7,7 +7,7 @@ class Enemies {
     return `${x}_${y}`;
   }
 
-  constructor (creek, number, width, height, x_size, y_size, palette, maze) {
+  constructor (creek, number, width, height, size, maze) {
     this.creek = creek;
     this.enemies = [];
     this.number = number;
@@ -16,7 +16,6 @@ class Enemies {
     height *= 2;
     this.map_width = width;
     this.map_height = height;
-    this.palette = palette;
     this.enemy_id_lookup = {};
 
     let x = random_int(width-1)+1,
@@ -32,7 +31,7 @@ class Enemies {
         y = random_int(height-2)+1;
       }
       positions[this.get_key(x, y)] = true;
-      this.enemies.push(new Enemy(creek, `enemy_${i}`, x, y, x_size, y_size, palette))
+      this.enemies.push(new Enemy(creek, `enemy_${i}`, x, y, size))
       this.enemy_id_lookup[`enemy_${i}`] = this.enemies.length-1;
     }
   }
@@ -67,13 +66,13 @@ class Enemies {
 }
 
 class Enemy {
-  constructor (creek, id, x, y, x_size, y_size, palette) {
+  constructor (creek, id, x, y, size) {
     this.creek = creek;
     this.id = id;
     this.x = x;
     this.y = y;
-    this.x_size = x_size;
-    this.y_size = y_size;
+    this.x_size = size;
+    this.y_size = size;
     this.color = "red"; // random_int(palette.length);
     this.layer = 2;
     this.max_health = 3;

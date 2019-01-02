@@ -7,7 +7,7 @@ class NPCs {
     return `${x}_${y}`;
   }
 
-  constructor (creek, number, width, height, x_size, y_size, palette, maze) {
+  constructor (creek, number, width, height, size, maze) {
     this.creek = creek;
     this.npcs = [];
     this.number = number;
@@ -16,7 +16,6 @@ class NPCs {
     height *= 2;
     this.map_width = width;
     this.map_height = height;
-    this.palette = palette;
     this.npc_id_lookup = {};
 
     let x = random_int(width-1)+1,
@@ -32,7 +31,7 @@ class NPCs {
         y = random_int(height-2)+1;
       }
       positions[this.get_key(x, y)] = true;
-      this.npcs.push(new NPC(creek, `npc_${i}`, x, y, x_size, y_size, palette))
+      this.npcs.push(new NPC(creek, `npc_${i}`, x, y, size))
       this.npc_id_lookup[`npc_${i}`] = this.npcs.length-1;
     }
   }
@@ -79,14 +78,13 @@ class NPCs {
 }
 
 class NPC {
-  constructor (creek, id, x, y, x_size, y_size, palette) {
+  constructor (creek, id, x, y, size) {
     this.creek = creek;
     this.id = id;
     this.x = x;
     this.y = y;
-    this.x_size = x_size;
-    this.y_size = y_size;
-    this.color = palette[random_int(palette.length)];
+    this.x_size = size;
+    this.y_size = size;
     this.layer = 2;
     this.active = true;
   }
