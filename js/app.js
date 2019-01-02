@@ -222,6 +222,7 @@ window.onload = () => {
     new Sound("pickup_success_c_2").get(),
     new Sound("pickup_success_f_2").get(),
     new Sound("level").get(),
+    new Sound("bwuh").get(),
     new Sound("bwuh_2").get(),
     new Sound("bwuh_low").get(),
     new Sound("cave_hopping", "resources/sounds/cave_hopping_longer.mp3", false, 0.6, true).get(),

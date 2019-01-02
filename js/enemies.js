@@ -145,7 +145,7 @@ class Enemy {
         console.log(`player takes 1 damage; player's health now ${player.health}`);
         this.last_color = this.color;
         this.color = 'white';
-  //      creek.get('audio').play(NPCs.lookup_sound(player.followers));
+        creek.get('audio').play('bwuh_2');
         this.x = this.last_x;
         this.y = this.last_y;
       }

@@ -71,6 +71,7 @@ class Player {
       enemies.give_damage_xy(this.x, this.y);
       this.last_color = this.color;
       this.color = "white";
+      creek.get('audio').play('bwuh_low');
     } else if (this.last_color) {
       this.color = this.last_color;
       this.last_color = null;
