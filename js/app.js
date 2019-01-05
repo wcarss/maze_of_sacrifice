@@ -10,7 +10,10 @@ window.onload = () => {
 
   document.getElementsByTagName('body')[0].setAttribute('style', 'background: grey');
 
-  creek.get('resources').init(creek, Resources).then(() => {
+  let player = new Player(),
+    maps = new Maps(12);
+
+  creek.get('resources').init(creek, Resources, player, maps).then(() => {
     let div = document.createElement('div');
 
     // require a click before playing any sounds, due to strict sound/interaction policies
@@ -23,14 +26,10 @@ window.onload = () => {
     });
     document.body.appendChild(div);
 
-    creek.init();
+    creek.init([player, maps]);
     creek.run();
+    creek.get('data').set('player', player);
+    creek.get('data').set('maps', maps);
+    maps.change_map(maps.make_id(0));
   });
-
-  let player = new Player(creek),
-    maps = new Maps(creek, 12);
-
-  creek.get('data').set('player', player);
-  creek.get('data').set('maps', maps);
-  maps.change_map(maps.make_id(0));
 };

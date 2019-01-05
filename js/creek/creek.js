@@ -2,6 +2,7 @@
 
 import Audio from './audio.js';
 import Resources from './resources.js';
+import Utilities from './utilities.js';
 
 class Creek {
   constructor () {
@@ -16,16 +17,26 @@ class Creek {
       entities: new Entities(),
       audio: new Audio(),
       resources: new Resources(),
+      utilities: new Utilities(),
     };
   };
 
-  init () {
+  init (external_modules) {
     let module = null;
 
     for (const module_name in this.modules) {
       module = this.modules[module_name];
       if (module.init && !module.has_done_init) {
         module.init(this);
+        module.has_done_init = true;
+      }
+    }
+
+    for (const external_module_name in external_modules) {
+      module = external_modules[external_module_name];
+      if (module.init && !module.has_done_init) {
+        module.init(this);
+        module.has_done_init = true;
       }
     }
 

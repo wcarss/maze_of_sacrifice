@@ -1,7 +1,7 @@
 import Palettes from './palettes.js';
 
 class Player {
-  constructor(creek, x, y, x_size, y_size, color, palette) {
+  constructor(x, y, x_size, y_size, color, palette) {
     this.x = x;
     this.y = y;
     this.x_size = x_size;
@@ -11,12 +11,17 @@ class Player {
     this.previous = [];
     this.previous_check = {};
     this.palette = palette;
-    this.creek = creek;
     this.followers = 0;
     this.default_wait_time = 180;
     this.wait_time = this.default_wait_time;
     this.max_health = 5;
     this.health = this.max_health;
+  }
+
+  init (creek) {
+    this.creek = creek;
+    creek.get('utilities').setup_throttle('player_attack', 300);
+    creek.get('utilities').setup_throttle('player_move', 90);
   }
 
   get_key (x, y) {
@@ -43,6 +48,7 @@ class Player {
       controls = creek.get('controls'),
       maze = creek.get('data').get('maze'),
       enemies = creek.get('data').get('enemies'),
+      utilities = creek.get('utilities'),
       key = maze.get_key,
       tile = maze.tiles[key(this.x, this.y)],
       n  = maze.tiles[key(this.x, this.y-1)],
@@ -68,8 +74,7 @@ class Player {
       creek.get('data').set('game_running', false);
     }
 
-    if (controls.check_key('Space') && (!this.attacked_at || (time.ticks - this.attacked_at > 350))) {
-      this.attacked_at = time.ticks;
+    if (controls.check_key('Space') && utilities.use_throttle('player_attack')) {
       enemies.give_damage_xy(this.x, this.y);
       creek.get('audio').play('slash');
     }
@@ -142,7 +147,7 @@ class Player {
       }
     }
 
-    if (((this.last_vdir || this.last_hdir) && this.moved_at) && (time.ticks - this.moved_at < this.wait_time)) {
+    if ((this.last_vdir || this.last_hdir) && !utilities.use_throttle('player_move')) {
       // don't move more than once / wait time ms in the same direction
       return;
     }

@@ -7,7 +7,7 @@ import NPCs from './npcs.js';
 import Enemies from './enemies.js';
 
 class Maps {
-  constructor(creek, number_of_maps) {
+  constructor(number_of_maps) {
     this.lookups = {
       'map_size': [4,  6,  6,  6,  6,  8,  8,  8,  8, 10, 10, 10, 14],
       'tile_size': [60, 60, 60, 60, 60, 50, 50, 50, 50, 40, 40, 40, 24],
@@ -15,15 +15,19 @@ class Maps {
       'enemy_count': [0,  1,  1,  2,  2,  2,  4,  6,  6,  6,  8, 10, 12],
     };
 
-    this.creek = creek;
     this.number_of_maps = number_of_maps;
     this.maps = {};
     this.current_map = null;
     this.current_map_id = null;
     this.next_map_id = null;
     this.last_map_id = null;
+  }
 
+  init (creek) {
     let map = null;
+
+    this.creek = creek;
+
     for (let i = 0; i <= this.number_of_maps; i++) {
       map = this.make_map(
         this.make_id(i),
