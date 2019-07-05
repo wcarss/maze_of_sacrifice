@@ -14,10 +14,11 @@ class Resources {
     this.creek = creek;
 
     //    let parsedresources = manager.get('config').get_resources(),
-    let resource_promise = null,
-      resource = null,
-      promises = [],
-      i = null;
+    const promises = [];
+    let has_sound = false;
+    let resource_promise = null;
+    let resource = null;
+    let i = null;
 
     for (i in parsed_resources) {
       resource = parsed_resources[i];
@@ -26,6 +27,7 @@ class Resources {
         resource_promise = this.load_image(resource);
         promises.push(resource_promise);
       } else if (resource.type === "sound") {
+        has_sound = true;
         resource_promise = this.load_sound(resource);
         promises.push(resource_promise);
       } else {
@@ -33,25 +35,25 @@ class Resources {
       }
     }
 
-    await Promise.all(promises).then(
-      loaded => {
-        let resource = null,
-          resource_index = null;
+    if (has_sound) {
+      this.create_sound_trigger();
+    }
 
-        this.has_done_init = true;
+    let loaded = null;
+    try {
+      loaded = await Promise.all(promises);
+    } catch (e) {
+      console.log("trouble loading resources.");
+    }
+    this.has_done_init = true;
 
-        for (resource_index in loaded) {
-          resource = loaded[resource_index];
-          this.resources[resource.type][resource.id] = resource;
-        }
-        console.log("resources after load are:");
-        console.log(this.resources);
-        this.post_resource_load();
-      },
-      () => {
-        console.log("trouble loading resources.");
-      }
-    );
+    for (i in loaded) {
+      resource = loaded[i];
+      this.resources[resource.type][resource.id] = resource;
+    }
+
+    console.log("resources after load are: ", this.resources);
+    this.post_resource_load();
   }
 
   get_resources() {
@@ -185,6 +187,27 @@ class Resources {
     // not implemented in new-creeek yet
     //    creek.get('game_state').post_resource_load(manager);
   }
+
+  // require a click before playing any sounds, due to strict sound/interaction policies
+  create_sound_trigger = () => {
+    const sound_trigger = document.createElement("div");
+
+    sound_trigger.id = "sound_guy";
+    sound_trigger.setAttribute(
+      "style",
+      "background: black; color: white; font-size: 3em; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100;"
+    );
+    sound_trigger.innerHTML =
+      "<div style='width: 20%; margin: 20% auto;'>Click to play!</div>";
+
+    const listener = () => {
+      this.creek.get("audio").play("cave_hopping");
+      sound_trigger.removeEventListener("click", listener);
+      sound_trigger.parentNode.removeChild(sound_trigger);
+    };
+    sound_trigger.addEventListener("click", listener);
+    document.body.appendChild(sound_trigger);
+  };
 }
 
 export default Resources;
