@@ -1,6 +1,6 @@
 class Maze {
   random_int(n) {
-    return parseInt(Math.floor(Math.random()*n));
+    return parseInt(Math.floor(Math.random() * n));
   }
 
   shuffle(a) {
@@ -20,24 +20,24 @@ class Maze {
     this.id = id;
     this.tiles = {};
     this.cells = [];
-    this.directions = ['n', 's', 'e', 'w'];
+    this.directions = ["n", "s", "e", "w"];
     this.opposite = {
-      'n': 's',
-      's': 'n',
-      'e': 'w',
-      'w': 'e'
+      n: "s",
+      s: "n",
+      e: "w",
+      w: "e"
     };
     this.dx = {
-      'n': 0,
-      's': 0,
-      'e': 1,
-      'w': -1
+      n: 0,
+      s: 0,
+      e: 1,
+      w: -1
     };
     this.dy = {
-     'n': -1,
-     's': 1,
-     'e': 0,
-     'w': 0
+      n: -1,
+      s: 1,
+      e: 0,
+      w: 0
     };
     this.width = width;
     this.height = height;
@@ -74,8 +74,8 @@ class Maze {
       cells = this.cells,
       tiles = this.tiles;
 
-    x = random_int(this.width-1)+1;
-    y = random_int(this.height-1)+1;
+    x = random_int(this.width - 1) + 1;
+    y = random_int(this.height - 1) + 1;
     tiles[get_key(x, y)] = new Tile(this.creek, x, y, this.x_size);
     cells.push([x, y]);
 
@@ -90,9 +90,21 @@ class Maze {
         dir = directions[dir_index];
         nx = x + dx[dir];
         ny = y + dy[dir];
-        if (nx > 0 && ny > 0 && nx < this.width && ny < this.height && tiles[get_key(nx, ny)] === undefined) { 
+        if (
+          nx > 0 &&
+          ny > 0 &&
+          nx < this.width &&
+          ny < this.height &&
+          tiles[get_key(nx, ny)] === undefined
+        ) {
           tiles[get_key(x, y)].walls[dir] = false;
-          tiles[get_key(nx, ny)] = new Tile(nx, ny, this.x_size, this.y_size, this.color); // palette[color_index]);
+          tiles[get_key(nx, ny)] = new Tile(
+            nx,
+            ny,
+            this.x_size,
+            this.y_size,
+            this.color
+          ); // palette[color_index]);
           tiles[get_key(nx, ny)].walls[opposite[dir]] = false;
           cells.push([nx, ny]);
           index = null;
@@ -105,7 +117,7 @@ class Maze {
       }
     }
 
-    let openness_parameter = 0.085*this.width*this.height; // random walls will come down!
+    let openness_parameter = 0.085 * this.width * this.height; // random walls will come down!
 
     if (this.width > 20) {
       openness_parameter *= 2.5;
@@ -113,9 +125,9 @@ class Maze {
 
     let tile = null;
     for (let i = 0; i < openness_parameter; i++) {
-      x = random_int(this.width-3)+2;
-      y = random_int(this.height-3)+2;
-      tile = tiles[get_key(x, y)]
+      x = random_int(this.width - 3) + 2;
+      y = random_int(this.height - 3) + 2;
+      tile = tiles[get_key(x, y)];
       shuffle(directions);
       for (dir_index = 0; dir_index < directions.length; dir_index++) {
         dir = directions[dir_index];
@@ -123,14 +135,20 @@ class Maze {
           tile.walls[dir] = false;
           tiles[get_key(x + dx[dir], y + dy[dir])].walls[opposite[dir]] = false;
           break;
-        } 
+        }
       }
     }
 
     let new_tiles = {};
-    for (let i = 1; i < this.width*2; i++) {
-      for (let j = 1; j < this.height*2; j++) {
-        new_tiles[get_key(i, j)] = new NewTile(this.creek, i, j, this.x_size, true);
+    for (let i = 1; i < this.width * 2; i++) {
+      for (let j = 1; j < this.height * 2; j++) {
+        new_tiles[get_key(i, j)] = new NewTile(
+          this.creek,
+          i,
+          j,
+          this.x_size,
+          true
+        );
       }
     }
 
@@ -142,26 +160,33 @@ class Maze {
           debugger;
         }
 
-        new_tiles[get_key(i*2, j*2)].wall = false;
-        new_tiles[get_key(i*2, j*2-1)].wall = tile.walls.n;
-        new_tiles[get_key(i*2, j*2+1)].wall = tile.walls.s;
-        new_tiles[get_key(i*2+1, j*2)].wall = tile.walls.e;
-        new_tiles[get_key(i*2-1, j*2)].wall = tile.walls.w;
+        new_tiles[get_key(i * 2, j * 2)].wall = false;
+        new_tiles[get_key(i * 2, j * 2 - 1)].wall = tile.walls.n;
+        new_tiles[get_key(i * 2, j * 2 + 1)].wall = tile.walls.s;
+        new_tiles[get_key(i * 2 + 1, j * 2)].wall = tile.walls.e;
+        new_tiles[get_key(i * 2 - 1, j * 2)].wall = tile.walls.w;
       }
     }
 
-    let n = null, s = null, e = null, w = null, ne = null, nw = null, se = null, sw = null;
-    for (let i = 3; i < this.width*2-2; i++) {
-      for (let j = 3; j < this.height*2-2; j++) {
+    let n = null,
+      s = null,
+      e = null,
+      w = null,
+      ne = null,
+      nw = null,
+      se = null,
+      sw = null;
+    for (let i = 3; i < this.width * 2 - 2; i++) {
+      for (let j = 3; j < this.height * 2 - 2; j++) {
         tile = new_tiles[get_key(i, j)];
-        n =  new_tiles[get_key(i, j-1)].wall;
-        s =  new_tiles[get_key(i, j+1)].wall;
-        e =  new_tiles[get_key(i+1, j)].wall;
-        w =  new_tiles[get_key(i-1, j)].wall;
-        nw = new_tiles[get_key(i-1, j-1)].wall;
-        ne = new_tiles[get_key(i+1, j-1)].wall;
-        sw = new_tiles[get_key(i-1, j+1)].wall;
-        se = new_tiles[get_key(i+1, j+1)].wall;
+        n = new_tiles[get_key(i, j - 1)].wall;
+        s = new_tiles[get_key(i, j + 1)].wall;
+        e = new_tiles[get_key(i + 1, j)].wall;
+        w = new_tiles[get_key(i - 1, j)].wall;
+        nw = new_tiles[get_key(i - 1, j - 1)].wall;
+        ne = new_tiles[get_key(i + 1, j - 1)].wall;
+        sw = new_tiles[get_key(i - 1, j + 1)].wall;
+        se = new_tiles[get_key(i + 1, j + 1)].wall;
 
         if (!n && !s && !e && !w && !ne && !nw && !se && !sw) {
           tile.wall = false;
@@ -182,10 +207,10 @@ class Maze {
       return;
     }
 
-    this.visit(x, y-1, n-1);
-    this.visit(x, y+1, n-1);
-    this.visit(x+1, y, n-1);
-    this.visit(x-1, y, n-1);
+    this.visit(x, y - 1, n - 1);
+    this.visit(x, y + 1, n - 1);
+    this.visit(x + 1, y, n - 1);
+    this.visit(x - 1, y, n - 1);
   }
 
   reveal(x, y, n) {
@@ -198,10 +223,10 @@ class Maze {
       return;
     }
 
-    this.reveal(x, y-1, n-1);
-    this.reveal(x, y+1, n-1);
-    this.reveal(x+1, y, n-1);
-    this.reveal(x-1, y, n-1);
+    this.reveal(x, y - 1, n - 1);
+    this.reveal(x, y + 1, n - 1);
+    this.reveal(x + 1, y, n - 1);
+    this.reveal(x - 1, y, n - 1);
   }
 }
 
@@ -213,8 +238,8 @@ class Tile {
   constructor(creek, x, y, size) {
     this.creek = creek;
     this.id = this.get_key(x, y);
-    this.x = x*size;
-    this.y = y*size;
+    this.x = x * size;
+    this.y = y * size;
     this.x_size = size;
     this.y_size = size;
     this.firstVisit = true;
@@ -230,24 +255,24 @@ class Tile {
     this.layer = 2;
   }
 
-  draw (context, interpolation) {
+  draw(context, interpolation) {
     context.fillStyle = "black";
     if (!this.visited && !this.revealed) {
-      context.fillRect(this.x, this.y, this.x_size, this.y_size); 
+      context.fillRect(this.x, this.y, this.x_size, this.y_size);
       return;
     }
 
     if (this.walls.n) {
-      context.fillRect(this.x, this.y, this.x_size+2, 2);
+      context.fillRect(this.x, this.y, this.x_size + 2, 2);
     }
     if (this.walls.s) {
-      context.fillRect(this.x, this.y+this.y_size-2, this.x_size+2, 2);
+      context.fillRect(this.x, this.y + this.y_size - 2, this.x_size + 2, 2);
     }
     if (this.walls.e) {
-      context.fillRect(this.x+this.x_size-2, this.y, 2, this.y_size+2);
+      context.fillRect(this.x + this.x_size - 2, this.y, 2, this.y_size + 2);
     }
     if (this.walls.w) {
-      context.fillRect(this.x, this.y, 2, this.y_size+2);
+      context.fillRect(this.x, this.y, 2, this.y_size + 2);
     }
 
     if (!this.visited && this.revealed) {
@@ -257,19 +282,18 @@ class Tile {
     }
   }
 
-  update (creek) {
-  }
+  update(creek) {}
 }
 
 class NewTile extends Tile {
-  constructor (creek, x, y, size, wall) {
+  constructor(creek, x, y, size, wall) {
     super(creek, x, y, size);
     this.wall = wall;
   }
 
-  draw (context, interpolation) {
-    let tree = this.creek.get('resources').get_image('tree'),
-      grass = this.creek.get('resources').get_image('grass');
+  draw(context, interpolation) {
+    let tree = this.creek.get("resources").get_image("tree"),
+      grass = this.creek.get("resources").get_image("grass");
 
     context.drawImage(grass.img, this.x, this.y, this.x_size, this.y_size);
     if (this.wall) {

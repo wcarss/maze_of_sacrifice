@@ -2,13 +2,13 @@
 
 class Utilities {
   constructor() {
-    this.THROTTLE_KEY = '_util_throttles';
+    this.THROTTLE_KEY = "_util_throttles";
   }
 
   init(creek) {
     this.creek = creek;
-    this.data = creek.get('data');
-    this.time = creek.get('time');
+    this.data = creek.get("data");
+    this.time = creek.get("time");
     this.data.set(this.THROTTLE_KEY, {});
   }
 
@@ -25,7 +25,7 @@ class Utilities {
   }
 
   get_throttle(id) {
-    let data = this.creek.get('data'),
+    let data = this.creek.get("data"),
       throttles = null;
 
     if (!data) {
@@ -42,7 +42,7 @@ class Utilities {
   }
 
   set_throttle(id, throttle) {
-    let throttles = this.creek.get('data').get(this.THROTTLE_KEY);
+    let throttles = this.creek.get("data").get(this.THROTTLE_KEY);
 
     if (throttles[id]) {
       console.warn(`setting a throttle '${id}' that already exists`);
@@ -53,14 +53,14 @@ class Utilities {
   }
 
   clear_throttle(id) {
-    let throttles = this.creek.get('data').get(this.THROTTLE_KEY);
+    let throttles = this.creek.get("data").get(this.THROTTLE_KEY);
 
     if (throttles[id]) {
       delete throttles[id];
     }
   }
 
-  setup_throttle (id, limit, func, args, timestamp) {
+  setup_throttle(id, limit, func, args, timestamp) {
     let throttle = this.get_throttle(id);
 
     if (throttle) {
@@ -75,13 +75,13 @@ class Utilities {
       func: func || null,
       args: args || null,
       invoke_count: 0,
-      run_count: 0,
+      run_count: 0
     };
 
     this.set_throttle(id, throttle);
   }
 
-  use_throttle (id, func, args, limit, timestamp) {
+  use_throttle(id, func, args, limit, timestamp) {
     let throttle = this.get_throttle(id),
       return_value = null;
 

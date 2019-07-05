@@ -1,5 +1,5 @@
 function random_int(num) {
-  return parseInt(Math.floor(Math.random()*num));
+  return parseInt(Math.floor(Math.random() * num));
 }
 
 class Enemies {
@@ -7,7 +7,7 @@ class Enemies {
     return `${x}_${y}`;
   }
 
-  constructor (creek, number, width, height, size, maze) {
+  constructor(creek, number, width, height, size, maze) {
     this.creek = creek;
     this.enemies = [];
     this.number = number;
@@ -18,27 +18,29 @@ class Enemies {
     this.map_height = height;
     this.enemy_id_lookup = {};
 
-    let x = random_int(width-1)+1,
-      y = random_int(height-1)+1,
+    let x = random_int(width - 1) + 1,
+      y = random_int(height - 1) + 1,
       positions = {};
 
     positions[this.get_key(2, 2)] = true;
-    positions[this.get_key(width-2, height-2)] = true;
+    positions[this.get_key(width - 2, height - 2)] = true;
 
     for (let i = 0; i < number; i++) {
-      while (positions[this.get_key(x, y)] || maze.tiles[maze.get_key(x, y)].wall) {
-        x = random_int(width-2)+1;
-        y = random_int(height-2)+1;
+      while (
+        positions[this.get_key(x, y)] ||
+        maze.tiles[maze.get_key(x, y)].wall
+      ) {
+        x = random_int(width - 2) + 1;
+        y = random_int(height - 2) + 1;
       }
       positions[this.get_key(x, y)] = true;
-      this.enemies.push(new Enemy(creek, `enemy_${i}`, x, y, size))
-      this.enemy_id_lookup[`enemy_${i}`] = this.enemies.length-1;
+      this.enemies.push(new Enemy(creek, `enemy_${i}`, x, y, size));
+      this.enemy_id_lookup[`enemy_${i}`] = this.enemies.length - 1;
     }
   }
 
   static lookup_sound(num) {
-    const sounds = {
-    }
+    const sounds = {};
   }
 
   get_enemies() {
@@ -53,8 +55,8 @@ class Enemies {
     let enemy = null;
 
     for (let enemy_index in this.enemies) {
-      for (let i = x-1; i <= x+1; i++) {
-        for (let j = y-1; j <= y+1; j++) {
+      for (let i = x - 1; i <= x + 1; i++) {
+        for (let j = y - 1; j <= y + 1; j++) {
           enemy = this.enemies[enemy_index];
           if (enemy && enemy.x === i && enemy.y === j) {
             enemy.give_damage();
@@ -66,7 +68,7 @@ class Enemies {
 }
 
 class Enemy {
-  constructor (creek, id, x, y, size) {
+  constructor(creek, id, x, y, size) {
     this.creek = creek;
     this.id = id;
     this.x = x;
@@ -82,30 +84,51 @@ class Enemy {
     this.moved_at = 0;
   }
 
-  draw (context, interpolation) {
-    let skeleton = this.creek.get('resources').get_image('skeleton'),
-      maze = this.creek.get('data').get('maze'),
+  draw(context, interpolation) {
+    let skeleton = this.creek.get("resources").get_image("skeleton"),
+      maze = this.creek.get("data").get("maze"),
       tile = maze.tiles[maze.get_key(this.x, this.y)];
 
     if (this.active) {
-      skeleton = this.creek.get('resources').get_image('skeleton');
+      skeleton = this.creek.get("resources").get_image("skeleton");
     } else {
-      skeleton = this.creek.get('resources').get_image('bones');
+      skeleton = this.creek.get("resources").get_image("bones");
     }
 
     if (tile.visited && this.active) {
       context.fillStyle = "red";
-      context.fillRect(this.x*this.x_size, (this.y)*this.y_size, this.x_size, 6);
+      context.fillRect(
+        this.x * this.x_size,
+        this.y * this.y_size,
+        this.x_size,
+        6
+      );
       context.fillStyle = "#00ff00";
-      context.fillRect(this.x*this.x_size, (this.y)*this.y_size, this.x_size*(this.health/this.max_health), 6);
+      context.fillRect(
+        this.x * this.x_size,
+        this.y * this.y_size,
+        this.x_size * (this.health / this.max_health),
+        6
+      );
     }
     if (tile.visited || tile.revealed) {
-      context.drawImage(skeleton.img, this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
+      context.drawImage(
+        skeleton.img,
+        this.x * this.x_size,
+        this.y * this.y_size,
+        this.x_size,
+        this.y_size
+      );
     }
     if (!tile.visited && tile.revealed) {
       context.globalAlpha = 0.3;
       context.fillStyle = "black";
-      context.fillRect(this.x*this.x_size, this.y*this.y_size, this.x_size, this.y_size);
+      context.fillRect(
+        this.x * this.x_size,
+        this.y * this.y_size,
+        this.x_size,
+        this.y_size
+      );
       context.globalAlpha = 1;
     }
   }
@@ -117,14 +140,14 @@ class Enemy {
 
   give_damage() {
     console.log(`${this.id} takes 1 damage, health is ${this.health}`);
-    this.creek.get('audio').play('bwuh_low');
+    this.creek.get("audio").play("bwuh_low");
     this.health -= 1;
   }
 
-  update (creek) {
-    const time = creek.get('time'),
-      player = creek.get('data').get('player'),
-      maze = creek.get('data').get('maze'),
+  update(creek) {
+    const time = creek.get("time"),
+      player = creek.get("data").get("player"),
+      maze = creek.get("data").get("maze"),
       key = maze.get_key;
 
     if (!this.active) return;
@@ -133,11 +156,14 @@ class Enemy {
       this.active = false;
     }
 
-    if (!this.destination || (this.x === this.destination.x && this.y === this.destination.y)) {
+    if (
+      !this.destination ||
+      (this.x === this.destination.x && this.y === this.destination.y)
+    ) {
       this.set_new_destination();
     }
 
-    if (time.ticks - this.moved_at > (Math.random()*400)+400) {
+    if (time.ticks - this.moved_at > Math.random() * 400 + 400) {
       this.moved_at = time.ticks;
       this.last_x = this.x;
       this.last_y = this.y;
@@ -162,17 +188,17 @@ class Enemy {
         this.last_color = null;
       } else if (player.x === this.x && player.y === this.y) {
         player.health -= 1;
-        console.log(`player takes 1 damage; player's health now ${player.health}`);
+        console.log(
+          `player takes 1 damage; player's health now ${player.health}`
+        );
         this.last_color = this.color;
-        this.color = 'white';
-        creek.get('audio').play('bwuh_2');
+        this.color = "white";
+        creek.get("audio").play("bwuh_2");
         this.x = this.last_x;
         this.y = this.last_y;
       }
     }
-
-
   }
-};
+}
 
 export default Enemies;
