@@ -41,10 +41,10 @@ class Maps {
       this.maps[map.id] = map;
 
       if (i === 0) {
-        map.last_map_id = null;
+        map.last_map_id = this.make_id(this.number_of_maps - 1);
       }
 
-      if (i === this.number_of_maps) {
+      if (i === this.number_of_maps - 1) {
         map.next_map_id = this.make_id(0);
       }
     }

@@ -18,9 +18,9 @@ class NPCs {
     this.map_height = height;
     this.npc_id_lookup = {};
 
-    let x = random_int(width - 1) + 1,
-      y = random_int(height - 1) + 1,
-      positions = {};
+    let x = random_int(width - 1) + 1;
+    let y = random_int(height - 1) + 1;
+    let positions = {};
 
     positions[this.get_key(2, 2)] = true;
     positions[this.get_key(width - 2, height - 2)] = true;

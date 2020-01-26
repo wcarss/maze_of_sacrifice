@@ -121,6 +121,7 @@ class End {
         data.get("maps").maps[next_map_id].last_map_id = current_map_id;
       }
       data.get("maps").change_map(next_map_id);
+      data.set("break_update_loop", true);
     }
   }
 }

@@ -181,15 +181,20 @@ class Updater {
   update() {
     this.list = this.entities.get();
 
-    this.list.forEach(element => {
+    for (const element of this.list) {
       if (
         this.controls.check_key("ShiftLeft") &&
         this.controls.check_key("Backquote")
       ) {
         debugger;
       }
+      if (this.data.get("break_update_loop") === true) {
+        console.log("update loop broken out of");
+        break;
+      }
+
       element.update(this.creek);
-    });
+    }
   }
 }
 
@@ -310,9 +315,13 @@ class Looper {
         loops += 1;
       }
 
-      interpolation =
-        (this.time.get_ticks() + skip_ticks - next_game_tick) / skip_ticks;
-      this.drawer.draw(interpolation);
+      if (this.data.get("break_update_loop") === true) {
+        this.data.set("break_update_loop", false);
+      } else {
+        interpolation =
+          (this.time.get_ticks() + skip_ticks - next_game_tick) / skip_ticks;
+        this.drawer.draw(interpolation);
+      }
 
       if (this.data.get("game_running")) {
         requestAnimationFrame(inner_loop);
