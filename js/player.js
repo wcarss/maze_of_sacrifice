@@ -16,12 +16,15 @@ class Player {
     this.wait_time = this.default_wait_time;
     this.max_health = 5;
     this.health = this.max_health;
+    this.paused = false;
+    this.muted = false;
   }
 
   init(creek) {
     this.creek = creek;
     creek.get("utilities").setup_throttle("player_attack", 300);
     creek.get("utilities").setup_throttle("player_move", 90);
+    creek.get("utilities").setup_throttle("player_pause", 90);
   }
 
   get_key(x, y) {
@@ -84,6 +87,29 @@ class Player {
       vdir = null,
       hdir = null,
       prev_check = null;
+
+    if (
+      (controls.check_key("Escape") || controls.check_key("KeyP")) &&
+      utilities.use_throttle("player_pause")
+    ) {
+      this.paused = !this.paused;
+      if (this.paused) {
+        creek.get("audio").pause_all();
+      } else {
+        creek.get("audio").unpause_all();
+      }
+    }
+
+    if (this.paused) return;
+
+    if (controls.check_key("KeyM") && utilities.use_throttle("player_pause")) {
+      this.muted = !this.muted;
+      if (this.muted) {
+        creek.get("audio").mute_all();
+      } else {
+        creek.get("audio").unmute_all();
+      }
+    }
 
     if (this.health < 1) {
       console.log("player lost!");

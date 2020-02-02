@@ -151,6 +151,7 @@ class Enemy {
       key = maze.get_key;
 
     if (!this.active) return;
+    if (player.paused) return;
 
     if (this.health < 1) {
       this.active = false;

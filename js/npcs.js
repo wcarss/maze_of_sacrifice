@@ -124,6 +124,8 @@ class NPC {
 
     const player = creek.get("data").get("player");
 
+    if (player.paused) return;
+
     if (player.x === this.x && player.y === this.y) {
       player.health += 1;
       player.followers += 1;

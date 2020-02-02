@@ -100,6 +100,8 @@ class End {
       current_map = data.get("maps").current_map,
       next_map_id = current_map.next_map_id;
 
+    if (player.paused) return;
+
     if (
       player.x === this.x &&
       player.y === this.y &&
