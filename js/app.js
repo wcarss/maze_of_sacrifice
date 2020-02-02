@@ -6,7 +6,7 @@ import Maps from "./maps.js";
 import Resources from "./resources.js";
 
 window.onload = async () => {
-  document.body.setAttribute("style", "background: grey");
+  document.body.setAttribute("style", "background: black");
 
   const creek = new Creek();
   const player = new Player();
