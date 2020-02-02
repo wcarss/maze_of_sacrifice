@@ -30,13 +30,15 @@ class Start {
   }
 
   update(creek) {
-    const data = creek.get("data"),
+    const controls = creek.get("controls"),
+      data = creek.get("data"),
       player = data.get("player"),
       maps = data.get("maps"),
       current_map = maps.current_map,
       last_map_id = current_map.last_map_id;
 
     if (
+      controls.check_key("Space") &&
       last_map_id &&
       player.x === this.x &&
       player.y === this.y &&
@@ -94,7 +96,8 @@ class End {
   }
 
   update(creek) {
-    const data = creek.get("data"),
+    const controls = creek.get("controls"),
+      data = creek.get("data"),
       player = data.get("player"),
       current_map_id = data.get("maps").current_map_id,
       current_map = data.get("maps").current_map,
@@ -103,6 +106,7 @@ class End {
     if (player.paused) return;
 
     if (
+      controls.check_key("Space") &&
       player.x === this.x &&
       player.y === this.y &&
       (player.last_x && player.last_y)

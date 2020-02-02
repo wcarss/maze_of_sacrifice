@@ -2,14 +2,14 @@
 
 0.1	0	this tab-separated-values file contains ideas in order of "how easily/quickly I think I can get to them", the ones at the top being soonest/easiest, and with a ranked # of how excited by the idea I actually feel on a scale from 1-10
 
-1	10	'space' on a warp to take you through it
+X	10	'space' on a warp to take you through it
 2	3	coins or other rewards gained when full health have special effect
 3	6	infinite play
 4	6	divergent warp paths
 5	8	different level types (e.g. snow or mountain)
 6	10	more in-level terrain+obstacle diversity
-7	10	pause-ability
-8	10	mute
+X	10	pause-ability
+X	10	mute
 9	8	different sorts of enemies (e.g. different attacks, movement, etc)
 10	8	moveable camera
 11	6	multiple audio tracks
