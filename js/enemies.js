@@ -155,6 +155,7 @@ class Enemy {
 
     if (this.health < 1) {
       this.active = false;
+      player.kills += 1;
     }
 
     if (

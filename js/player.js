@@ -18,6 +18,9 @@ class Player {
     this.health = this.max_health;
     this.paused = false;
     this.muted = false;
+    this.coins = 0;
+    this.kills = 0;
+    this.level = 0;
   }
 
   init(creek) {
@@ -59,6 +62,14 @@ class Player {
       this.y * this.y_size,
       this.x_size,
       this.y_size
+    );
+    context.clearRect(50, context.canvas.height - 30, 352, 35);
+    context.font = "28px serif";
+    context.fillStyle = "white";
+    context.fillText(
+      `coins: ${this.coins}   kills: ${this.kills}  level: ${this.level + 1}`,
+      70,
+      context.canvas.height - 5
     );
   }
 

@@ -129,6 +129,8 @@ class Maps {
     }
 
     map.setup_player(player, player_x, player_y);
+    console.log(`setting player.level from ${player.level} to ${map_id}`);
+    player.level = map_id;
 
     this.last_map_change = time.ticks;
     this.current_map = this.maps[map_id];
@@ -145,7 +147,7 @@ class Maps {
   }
 
   make_id(id) {
-    return `map_${id}`;
+    return id;
   }
 }
 

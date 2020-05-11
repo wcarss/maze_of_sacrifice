@@ -129,6 +129,7 @@ class NPC {
     if (player.x === this.x && player.y === this.y) {
       player.health += 1;
       player.followers += 1;
+      player.coins += 1;
       if (player.health > player.max_health) {
         player.health = player.max_health;
       }
