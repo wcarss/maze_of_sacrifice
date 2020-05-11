@@ -12,7 +12,7 @@ class Maps {
       map_size: [4, 6, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 14],
       tile_size: [60, 60, 60, 60, 60, 50, 50, 50, 50, 40, 40, 40, 24],
       npc_count: [1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 6, 6, 8],
-      enemy_count: [0, 1, 1, 2, 2, 2, 4, 6, 6, 6, 8, 10, 12]
+      enemy_count: [0, 1, 1, 2, 2, 2, 4, 6, 6, 6, 8, 10, 12],
     };
 
     this.number_of_maps = number_of_maps;
@@ -77,7 +77,7 @@ class Maps {
         maze
       );
 
-    Object.keys(maze.tiles).forEach(key => {
+    Object.keys(maze.tiles).forEach((key) => {
       entity_list.push(maze.tiles[key]);
     });
 
@@ -108,7 +108,7 @@ class Maps {
         player.y_size = tile_size;
         this.player = player;
         this.entity_list.push(player);
-      }
+      },
     };
   }
 

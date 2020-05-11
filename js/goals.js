@@ -39,7 +39,7 @@ class Start {
 
     if (
       controls.check_key("Space") &&
-      last_map_id &&
+      last_map_id !== undefined &&
       player.x === this.x &&
       player.y === this.y &&
       (player.last_x && player.last_y)
