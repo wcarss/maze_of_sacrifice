@@ -97,6 +97,11 @@ class Maps {
       npcs: npcs,
       maze: maze,
       enemies: enemies,
+      tile_size: tile_size,
+      width: map_size,
+      height: map_size,
+      pixel_width: map_size * tile_size * 2,
+      pixel_height: map_size * tile_size * 2,
       setup_player: function(player, player_x, player_y) {
         player.x = player_x || 2;
         player.y = player_y || 2;

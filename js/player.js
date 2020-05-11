@@ -71,6 +71,59 @@ class Player {
       70,
       context.canvas.height - 5
     );
+
+    if (this.health < 1) {
+      const data = this.creek.get("data");
+      const map = data.get("maps").current_map;
+      const mid_map_height = map.pixel_height / 2 + 30; // half of map height w/ 1-tile offset
+      const mid_map_width = map.pixel_width / 2 + 30; // half of map width w/ 1-tile offset
+
+      context.font = "44px serif";
+      const defeatString = `PLAYER DEFEATED!`;
+      const defeatMeasure = context.measureText(defeatString);
+      const defeatHeight =
+        defeatMeasure.actualBoundingBoxAscent +
+        defeatMeasure.actualBoundingBoxDescent;
+      context.fillStyle = "#222";
+
+      context.fillRect(
+        0,
+        // 30px above mid-height, at line-top, and 10px for padding
+        mid_map_height - 30 - defeatMeasure.actualBoundingBoxAscent - 10,
+        map.pixel_width,
+        // the height of the line above+below + 10px padding above+below
+        defeatHeight + 20
+      );
+      context.fillStyle = "red";
+
+      context.fillText(
+        defeatString,
+        mid_map_width - defeatMeasure.width / 2,
+        mid_map_height - 30
+      );
+
+      context.font = "28px serif";
+      const refreshString = `refresh to play again...`;
+      const refreshMeasure = context.measureText(refreshString);
+      const refreshHeight =
+        refreshMeasure.actualBoundingBoxAscent +
+        refreshMeasure.actualBoundingBoxDescent;
+      context.fillStyle = "#222";
+      context.fillRect(
+        0,
+        mid_map_height + 30 - refreshMeasure.actualBoundingBoxAscent - 10,
+        map.pixel_width,
+        // the height of the line above+below + 10px padding above+below
+        refreshHeight + 18
+      );
+      context.fillStyle = "red";
+
+      context.fillText(
+        refreshString,
+        mid_map_width - refreshMeasure.width / 2,
+        mid_map_height + 30
+      );
+    }
   }
 
   update(creek) {
