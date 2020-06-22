@@ -61,6 +61,15 @@ class Start {
       );
     }
   };
+
+  get rect() {
+    return {
+      x: this.x * this.x_size,
+      y: this.y * this.y_size,
+      x_size: this.x_size,
+      y_size: this.y_size,
+    };
+  }
 }
 
 class End {
@@ -126,6 +135,15 @@ class End {
       data.break_update_loop = true;
     }
   };
+
+  get rect() {
+    return {
+      x: this.x * this.x_size,
+      y: this.y * this.y_size,
+      x_size: this.x_size,
+      y_size: this.y_size,
+    };
+  }
 }
 
 export { Start, End };

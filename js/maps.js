@@ -51,6 +51,7 @@ class Maps {
   };
 
   make_map = (id, tile_size, map_size, npc_count, enemy_count) => {
+    const creek = this.creek;
     const entity_list = [];
     const start = new Start(this.creek, 2, 2, tile_size);
     const end = new End(
@@ -144,6 +145,11 @@ class Maps {
     this.current_map_id = map_id;
     this.next_map_id = this.current_map.next_map_id;
     this.last_map_id = this.current_map.last_map_id;
+
+    console.log('camera x and y:', player.x, ',', player.y);
+    console.log(player);
+    console.log('alt x and y:', player_x, ',', player_y);
+    this.creek.camera.center(player.x*player.x_size, player.y*player.y_size);
 
     data.entity_list = map.entity_list;
     data.npcs = map.npcs;

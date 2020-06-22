@@ -194,6 +194,15 @@ class Enemy {
       }
     }
   };
+
+  get rect() {
+    return {
+      x: this.x * this.x_size,
+      y: this.y * this.y_size,
+      x_size: this.x_size,
+      y_size: this.y_size,
+    };
+  }
 }
 
 export default Enemies;

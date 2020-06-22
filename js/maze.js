@@ -277,6 +277,15 @@ class Tile {
   };
 
   update = creek => {};
+
+  get rect() {
+    return {
+      x: this.x,
+      y: this.y,
+      x_size: this.x_size,
+      y_size: this.y_size,
+    };
+  }
 }
 
 class NewTile extends Tile {
@@ -304,6 +313,15 @@ class NewTile extends Tile {
       }
     }
   };
+
+  get rect() {
+    return {
+      x: this.x,
+      y: this.y,
+      x_size: this.x_size,
+      y_size: this.y_size,
+    };
+  }
 }
 
 export default Maze;

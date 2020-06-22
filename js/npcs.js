@@ -112,6 +112,15 @@ class NPC {
     }
   };
 
+  get rect() {
+    return {
+      x: this.x * this.x_size,
+      y: this.y * this.y_size,
+      x_size: this.x_size,
+      y_size: this.y_size,
+    };
+  }
+
   update = creek => {
     if (!this.active) return;
 

@@ -3,15 +3,19 @@
 import Audio from "./audio.js";
 import Resources from "./resources.js";
 import Utilities from "./utilities.js";
+import Camera from "./camera.js";
+import Physics from "./physics.js";
 
 class Creek {
   constructor() {
     this._modules = {
       looper: new Looper(),
+      physics: new Physics(),
       updater: new Updater(),
       drawer: new Drawer(),
       time: new Time(),
       context_manager: new ContextManager(),
+      camera: new Camera(),
       data: new Data(),
       controls: new Controls(),
       entities: new Entities(),
@@ -23,19 +27,10 @@ class Creek {
 
     this.proxy = new Proxy(this, {
       get: (target, property) => {
-        // if (this.reservedWords.find(property)) {
-        //   return target[property];
-        // }
-        //console.log('getting', property);
-        //if (property === 'resources') {
-//          debugger;
-        //}
         if (target._modules[property]) {
           return target._modules[property]
         }
         return target[property];
-
-        //console.error(`requested nonexistent module '${property}'`);
       },
       set: (target, property, value) => {
         if (this.reservedWords.find(property)) {
@@ -219,14 +214,22 @@ class Drawer {
 
   init = creek => {
     this.context_manager = creek.context_manager;
+    this.physics = creek.physics;
+    this.camera = creek.camera;
     this.entities = creek.entities;
   }
 
   draw(interpolation) {
-    //    context.clearRect(0, 0, this.context.get_width(), this.context.get_height());
+    this.context_manager.context.clearRect(0, 0, this.context_manager.width, this.context_manager.height);
+    const offset = this.camera.offset;
+    this.context_manager.context.setTransform(1,0,0,1, this.camera.camera.left_margin-offset.x, this.camera.camera.top_margin-offset.y);
     for (const element of this.entities.list) {
-      element.draw(this.context_manager.context, interpolation);
+      if (this.physics.collide(this.camera, element)) {
+        element.draw(this.context_manager.context, interpolation);        
+      }
     }
+    // for camera debugging:
+    // this.camera.draw(this.context_manager.context, interpolation);
   }
 }
 

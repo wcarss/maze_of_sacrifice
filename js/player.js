@@ -23,16 +23,18 @@ class Player {
     this.coins = 0;
     this.kills = 0;
     this.level = 0;
+    this.id = "player";
   }
 
   init = creek => {
     this.creek = creek;
+    this.camera = creek.camera;
     creek.utilities.setup_throttle("player_attack", 300);
     creek.utilities.setup_throttle("player_move", 90);
     creek.utilities.setup_throttle("player_pause", 90);
   };
 
-  get_key = (x, y) => `${x}-${y}`;
+  get_key = (x, y) => `${x}_${y}`;
 
   draw = (context, interpolation) => {
     let size = null;
@@ -279,6 +281,7 @@ class Player {
     this.last_y = this.y;
     this.x = new_x;
     this.y = new_y;
+    this.camera.center(this.x*this.x_size, this.y*this.y_size);
 
     maze.visit(this.x, this.y, 1, true);
     maze.reveal(this.x, this.y, 3);
@@ -288,6 +291,15 @@ class Player {
     maze.reveal(this.x + 1, this.y + 1, 0);
 
     this.moved_at = time.ticks;
+  }
+
+  get rect() {
+    return {
+      x: this.x*this.x_size,
+      y: this.y*this.y_size,
+      x_size: this.x_size,
+      y_size: this.y_size,
+    };
   }
 }
 

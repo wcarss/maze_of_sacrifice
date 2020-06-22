@@ -65,7 +65,27 @@ class Utilities {
     // for debugging: console.log(`runs: ${throttle.run_count}, time: ${this.time.ticks}, throttle timestamp: ${timestamp}, limit: ${limit}`);
 
     return return_value;
-  }
+  };
+
+  clamp = (val, low, high, epsilon, debug) => {
+    epsilon = epsilon || 0.001;
+
+    if (val <= low - epsilon) {
+      if (debug) {
+        console.log(val + "clamped up to " + low);
+      }
+      val = low;
+    }
+
+    if (val >= high + epsilon) {
+      if (debug) {
+        console.log(val + "clamped down to " + high);
+      }
+      val = high;
+    }
+
+    return val;
+  };
 }
 
 export default Utilities;
