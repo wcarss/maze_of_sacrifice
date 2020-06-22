@@ -23,7 +23,7 @@ class Maps {
     this.last_map_id = null;
   }
 
-  init(creek) {
+  init = creek => {
     let map = null;
 
     this.creek = creek;
@@ -48,34 +48,34 @@ class Maps {
         map.next_map_id = this.make_id(0);
       }
     }
-  }
+  };
 
-  make_map(id, tile_size, map_size, npc_count, enemy_count) {
-    let entity_list = [],
-      start = new Start(this.creek, 2, 2, tile_size),
-      end = new End(
-        this.creek,
-        (map_size - 1) * 2,
-        (map_size - 1) * 2,
-        tile_size
-      ),
-      maze = new Maze(this.creek, `maze_${id}`, map_size, map_size, tile_size),
-      npcs = new NPCs(
-        this.creek,
-        npc_count,
-        map_size,
-        map_size,
-        tile_size,
-        maze
-      ),
-      enemies = new Enemies(
-        this.creek,
-        enemy_count,
-        map_size,
-        map_size,
-        tile_size,
-        maze
-      );
+  make_map = (id, tile_size, map_size, npc_count, enemy_count) => {
+    const entity_list = [];
+    const start = new Start(this.creek, 2, 2, tile_size);
+    const end = new End(
+      this.creek,
+      (map_size - 1) * 2,
+      (map_size - 1) * 2,
+      tile_size
+    );
+    const maze = new Maze(this.creek, `maze_${id}`, map_size, map_size, tile_size);
+    const npcs = new NPCs(
+      this.creek,
+      npc_count,
+      map_size,
+      map_size,
+      tile_size,
+      maze
+    );
+    const enemies = new Enemies(
+      this.creek,
+      enemy_count,
+      map_size,
+      map_size,
+      tile_size,
+      maze
+    );
 
     Object.keys(maze.tiles).forEach((key) => {
       entity_list.push(maze.tiles[key]);
@@ -91,18 +91,19 @@ class Maps {
     entity_list.push(...enemies.get_enemies());
 
     return {
-      id: id,
-      entity_list: entity_list,
+      id,
+      entity_list,
       player: null,
-      npcs: npcs,
-      maze: maze,
-      enemies: enemies,
-      tile_size: tile_size,
+      npcs,
+      maze,
+      enemies,
+      tile_size,
       width: map_size,
       height: map_size,
       pixel_width: map_size * tile_size * 2,
       pixel_height: map_size * tile_size * 2,
-      setup_player: function(player, player_x, player_y) {
+      // function is intentional here to use caller-scoped this
+      setup_player: function (player, player_x, player_y) {
         player.x = player_x || 2;
         player.y = player_y || 2;
         player.last_x = null;
@@ -115,14 +116,14 @@ class Maps {
         this.entity_list.push(player);
       },
     };
-  }
+  };
 
-  change_map(map_id, player_x, player_y) {
-    let data = this.creek.get("data"),
-      time = this.creek.get("time"),
-      map = this.maps[map_id],
-      player = data.get("player"),
-      last_map_change = this.last_map_change;
+  change_map = (map_id, player_x, player_y) => {
+    const data = this.creek.data;
+    const time = this.creek.time;
+    const map = this.maps[map_id];
+    const player = data.player;
+    const last_map_change = this.last_map_change;
 
     if (last_map_change && time.ticks - last_map_change < 500) {
       return;
@@ -144,16 +145,14 @@ class Maps {
     this.next_map_id = this.current_map.next_map_id;
     this.last_map_id = this.current_map.last_map_id;
 
-    data.set("entity_list", map.entity_list);
-    data.set("npcs", map.npcs);
-    data.set("maze", map.maze);
-    data.set("enemies", map.enemies);
-    data.set("player", map.player);
-  }
+    data.entity_list = map.entity_list;
+    data.npcs = map.npcs;
+    data.maze = map.maze;
+    data.enemies = map.enemies;
+    data.player = map.player;
+  };
 
-  make_id(id) {
-    return id;
-  }
+  make_id = id => id;
 }
 
 export default Maps;

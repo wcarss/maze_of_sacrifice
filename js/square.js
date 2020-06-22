@@ -3,16 +3,12 @@
 import Palettes from "./palettes.js";
 
 class Square {
-  static get_palette_id(seed) {
-    return seed % Palettes.length;
-  }
-
-  static get_palette(id) {
-    return Palettes[id];
-  }
+  static get_palette_id = seed => seed % Palettes.length;
+  static get_palette = id => Palettes[id];
 
   constructor(id, seed, palette) {
-    (this.id = `square_${id}`), (this.seed = seed);
+    this.id = `square_${id}`;
+    this.seed = seed;
 
     this.x_size = Math.random() * 8 + 2;
     this.y_size = Math.random() * 8 + 2;
@@ -37,7 +33,7 @@ class Square {
     this.color = this.get_color();
   }
 
-  get_speed(id) {
+  get_speed = id => {
     let variation = 0.001;
     const roll = Math.random();
     if (roll > 0.999) {
@@ -54,39 +50,39 @@ class Square {
       }
     }
     return id * (variation * (this.seed * 0.001)) + 2;
-  }
+  };
 
-  get_color() {
+  get_color = () => {
     return this.palette[(Math.random() * this.palette.length) | 0];
     //return "black";
-    const r = parseInt(Math.round(Math.random() * 255)) + 0,
-      g = parseInt(Math.round(Math.random() * 255)) + 0,
-      b = parseInt(Math.round(Math.random() * 255)) + 0;
+    //const r = parseInt(Math.round(Math.random() * 255)) + 0;
+    //const g = parseInt(Math.round(Math.random() * 255)) + 0;
+    //const b = parseInt(Math.round(Math.random() * 255)) + 0;
+    //
+    //return `rgba(${r}, ${g}, ${b}, 1)`;
+  };
 
-    return `rgba(${r}, ${g}, ${b}, 1)`;
-  }
-
-  draw(context, interpolation) {
+  draw = (context, interpolation) => {
     //if (Math.random() > 0.95) {
     //  this.color = this.get_color();
     //}
     context.fillStyle = this.color;
     context.fillRect(this.x, this.y, this.x_size, this.y_size);
-  }
+  };
 
-  update(creek) {
+  update = creek => {
     this.x += this.x_speed;
     this.y += this.y_speed;
-    if (this.x > creek.get("context").get_width() - this.x_size || this.x < 0) {
+    if (this.x > creek.context_manager.width - this.x_size || this.x < 0) {
       this.x_speed *= -1;
     }
     if (
-      this.y > creek.get("context").get_height() - this.y_size ||
+      this.y > creek.context_manager.height - this.y_size ||
       this.y < 0
     ) {
       this.y_speed *= -1;
     }
-  }
+  };
 }
 
 export default Square;

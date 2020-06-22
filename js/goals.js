@@ -10,9 +10,9 @@ class Start {
     this.layer = 1;
   }
 
-  draw(context, interpolation) {
-    let grass = this.creek.get("resources").get_image("grass");
-    let temple = this.creek.get("resources").get_image("temple");
+  draw = (context, interpolation) => {
+    const grass = this.creek.resources.get_image("grass");
+    const temple = this.creek.resources.get_image("temple");
     context.drawImage(
       grass.img,
       this.x * this.x_size,
@@ -27,15 +27,16 @@ class Start {
       this.x_size,
       this.y_size
     );
-  }
+  };
 
-  update(creek) {
-    const controls = creek.get("controls"),
-      data = creek.get("data"),
-      player = data.get("player"),
-      maps = data.get("maps"),
-      current_map = maps.current_map,
-      last_map_id = current_map.last_map_id;
+  update = creek => {
+    const controls = creek.controls;
+    const data = creek.data;
+    const player = data.player;
+    const maps = data.maps;
+    const current_map = maps.current_map;
+    const last_map_id = current_map.last_map_id;
+    const context_manager = creek.context_manager;
 
     if (
       controls.check_key("Space") &&
@@ -44,16 +45,13 @@ class Start {
       player.y === this.y &&
       (player.last_x && player.last_y)
     ) {
-      creek
-        .get("context")
-        .get()
-        .clearRect(
-          0,
-          0,
-          creek.get("context").get_width(),
-          creek.get("context").get_height()
-        );
-      creek.get("audio").play("level");
+      context_manager.context.clearRect(
+        0,
+        0,
+        context_manager.width,
+        context_manager.height
+      );
+      creek.audio.play("level");
       current_map.exit_x = this.x;
       current_map.exit_y = this.y;
       maps.change_map(
@@ -62,7 +60,7 @@ class Start {
         maps.maps[last_map_id].exit_y
       );
     }
-  }
+  };
 }
 
 class End {
@@ -76,9 +74,9 @@ class End {
     this.last_level = 12;
   }
 
-  draw(context, interpolation) {
-    let grass = this.creek.get("resources").get_image("grass");
-    let temple = this.creek.get("resources").get_image("temple");
+  draw = (context, interpolation) => {
+    const grass = this.creek.resources.get_image("grass");
+    const temple = this.creek.resources.get_image("temple");
     context.drawImage(
       grass.img,
       this.x * this.x_size,
@@ -93,15 +91,16 @@ class End {
       this.x_size,
       this.y_size
     );
-  }
+  };
 
-  update(creek) {
-    const controls = creek.get("controls"),
-      data = creek.get("data"),
-      player = data.get("player"),
-      current_map_id = data.get("maps").current_map_id,
-      current_map = data.get("maps").current_map,
-      next_map_id = current_map.next_map_id;
+  update = creek => {
+    const controls = creek.controls;
+    const data = creek.data;
+    const player = data.player;
+    const current_map_id = data.maps.current_map_id;
+    const current_map = data.maps.current_map;
+    const next_map_id = current_map.next_map_id;
+    const context_manager = creek.context_manager;
 
     if (player.paused) return;
 
@@ -111,25 +110,22 @@ class End {
       player.y === this.y &&
       (player.last_x && player.last_y)
     ) {
-      creek
-        .get("context")
-        .get()
-        .clearRect(
-          0,
-          0,
-          creek.get("context").get_width(),
-          creek.get("context").get_height()
-        );
-      creek.get("audio").play("level");
+      context_manager.context.clearRect(
+        0,
+        0,
+        context_manager.width,
+        context_manager.height
+      );
+      creek.audio.play("level");
       current_map.exit_x = this.x;
       current_map.exit_y = this.y;
       if (next_map_id === "map_0") {
-        data.get("maps").maps[next_map_id].last_map_id = current_map_id;
+        data.maps.maps[next_map_id].last_map_id = current_map_id;
       }
-      data.get("maps").change_map(next_map_id);
-      data.set("break_update_loop", true);
+      data.maps.change_map(next_map_id);
+      data.break_update_loop = true;
     }
-  }
+  };
 }
 
 export { Start, End };

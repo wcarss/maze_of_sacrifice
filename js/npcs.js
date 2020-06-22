@@ -1,11 +1,9 @@
-function random_int(num) {
-  return parseInt(Math.floor(Math.random() * num));
-}
+"use strict";
+
+const random_int = num => parseInt(Math.floor(Math.random() * num));
 
 class NPCs {
-  get_key(x, y) {
-    return `${x}_${y}`;
-  }
+  get_key = (x, y) => `${x}_${y}`;
 
   constructor(creek, number, width, height, size, maze) {
     this.creek = creek;
@@ -70,13 +68,8 @@ class NPCs {
     }
   }
 
-  get_npcs() {
-    return this.npcs;
-  }
-
-  get_npc(id) {
-    return this.npcs[this.npc_id_lookup[id]];
-  }
+  get_npcs = () => this.npcs;
+  get_npc = id => this.npcs[this.npc_id_lookup[id]];
 }
 
 class NPC {
@@ -91,11 +84,11 @@ class NPC {
     this.active = true;
   }
 
-  draw(context, interpolation) {
+  draw = (context, interpolation) => {
     if (this.active) {
-      let coin = this.creek.get("resources").get_image("coin"),
-        maze = this.creek.get("data").get("maze"),
-        tile = maze.tiles[maze.get_key(this.x, this.y)];
+      let coin = this.creek.resources.get_image("coin");
+      let maze = this.creek.data.maze;
+      let tile = maze.tiles[maze.get_key(this.x, this.y)];
       if (tile.visited || tile.revealed) {
         context.drawImage(
           coin.img,
@@ -117,12 +110,12 @@ class NPC {
         context.globalAlpha = 1;
       }
     }
-  }
+  };
 
-  update(creek) {
+  update = creek => {
     if (!this.active) return;
 
-    const player = creek.get("data").get("player");
+    const player = creek.data.player;
 
     if (player.paused) return;
 
@@ -133,7 +126,7 @@ class NPC {
       if (player.health > player.max_health) {
         player.health = player.max_health;
       }
-      creek.get("audio").play(NPCs.lookup_sound(player.followers));
+      creek.audio.play(NPCs.lookup_sound(player.followers));
       this.active = false;
     }
   }

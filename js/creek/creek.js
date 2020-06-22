@@ -6,112 +6,120 @@ import Utilities from "./utilities.js";
 
 class Creek {
   constructor() {
-    this.modules = {
+    this._modules = {
       looper: new Looper(),
       updater: new Updater(),
       drawer: new Drawer(),
       time: new Time(),
-      context: new Context(),
+      context_manager: new ContextManager(),
       data: new Data(),
       controls: new Controls(),
       entities: new Entities(),
       audio: new Audio(),
       resources: new Resources(),
-      utilities: new Utilities()
+      utilities: new Utilities(),
     };
+    this.reservedWords = ['reservedWords', 'run', 'init', '_modules'];
+
+    this.proxy = new Proxy(this, {
+      get: (target, property) => {
+        // if (this.reservedWords.find(property)) {
+        //   return target[property];
+        // }
+        //console.log('getting', property);
+        //if (property === 'resources') {
+//          debugger;
+        //}
+        if (target._modules[property]) {
+          return target._modules[property]
+        }
+        return target[property];
+
+        //console.error(`requested nonexistent module '${property}'`);
+      },
+      set: (target, property, value) => {
+        if (this.reservedWords.find(property)) {
+          console.error(`cannot create module using reserved name ${property}`);
+        }
+        if (this._modules[property]) {
+          console.error(`cannot create module using existing module name ${property}`);
+        }
+
+        target[property] = value;
+        return true;
+      }
+    });
+    return this.proxy;
   }
 
-  init(external_modules) {
-    let module = null;
+  init = external_modules => {
+    const creek_modules = [
+      ...Object.values(this._modules),
+      ...Object.values(external_modules)
+    ];
 
-    for (const module_name in this.modules) {
-      module = this.modules[module_name];
-      if (module.init && !module.has_done_init) {
-        module.init(this);
-        module.has_done_init = true;
+    for (const creek_module of creek_modules) {
+      if (creek_module.init && !creek_module.has_done_init) {
+        creek_module.init(this.proxy);
+        creek_module.has_done_init = true;
       }
     }
+  };
 
-    for (const external_module_name in external_modules) {
-      module = external_modules[external_module_name];
-      if (module.init && !module.has_done_init) {
-        module.init(this);
-        module.has_done_init = true;
-      }
-    }
-
-    console.log("creek init.");
-  }
-
-  get(id) {
-    const got = this.modules[id];
-
-    if (!got) {
-      console.error(`requested nonexistent module '${id}'`);
-    }
-
-    return got;
-  }
-
-  run() {
-    this.get("looper").loop(this);
-  }
+  run = () => {
+    this._modules.looper.loop(this.proxy);
+  };
 }
 
 class Time {
   constructor() {
     this.ticks = 0;
   }
-  set_ticks() {
-    this.ticks = performance.now();
-    return this.ticks;
-  }
-  get_ticks() {
-    return this.ticks;
-  }
+  set_ticks = () => this.ticks = performance.now();
+  get_ticks = () => this.ticks;
 }
 
 class Controls {
   constructor() {
-    (this.keys = {}),
-      (this.mouse = {}),
-      (this.events = {
-        pointermove: event => this.set_coords(event.clientX, event.clientY),
-        touchmove: event => {
-          const touches = event.changedTouches;
-          for (let i = 0; i < touches.length; i++) {
-            if (touches[i] && touches[i].pageX && touches[i].pageY) {
-              this.set_coords(touches[i].pageX, touches[i].pageY);
-            }
+    this.keys = {};
+    this.mouse = {};
+    this.events = {
+      pointermove: event => this.set_coords(event.clientX, event.clientY),
+      touchmove: event => {
+        const touches = event.changedTouches;
+        for (let i = 0; i < touches.length; i++) {
+          if (touches[i] && touches[i].pageX && touches[i].pageY) {
+            this.set_coords(touches[i].pageX, touches[i].pageY);
           }
-          return this.set(this.mouse, 1, true);
-        },
-        touchcancel: event => this.set(this.mouse, 1, false),
-        pointercancel: event => this.set(this.mouse, event.which, false),
-        keydown: event => this.set(this.keys, event.code, true),
-        keyup: event => this.set(this.keys, event.code, false),
-        pointerdown: event => {
-          this.set_coords(event.clientX, event.clientY);
-          return this.set(this.mouse, event.which, true);
-        },
-        touchstart: event => {
-          this.set_coords(event.clientX, event.clientY);
-          return this.set(this.mouse, 1, true);
-        },
-        pointerup: event => this.set(this.mouse, event.which, false),
-        touchend: event => this.set(this.mouse, 1, false)
-      });
+        }
+        return this.set_store(this.mouse, 1, true);
+      },
+      touchcancel: event => this.set_store(this.mouse, 1, false),
+      pointercancel: event => this.set_store(this.mouse, event.which, false),
+      keydown: event => this.set_store(this.keys, event.code, true),
+      keyup: event => this.set_store(this.keys, event.code, false),
+      pointerdown: event => {
+        this.set_coords(event.clientX, event.clientY);
+        return this.set_store(this.mouse, event.which, true);
+      },
+      touchstart: event => {
+        this.set_coords(event.clientX, event.clientY);
+        return this.set_store(this.mouse, 1, true);
+      },
+      pointerup: event => this.set_store(this.mouse, event.which, false),
+      touchend: event => this.set_store(this.mouse, 1, false)
+    };
+  }
+
+  init = creek => {
+    this.creek = creek;
 
     for (const event_name in this.events) {
       document.addEventListener(event_name, this.events[event_name]);
     }
-  }
+  };
 
-  init(creek) {
-    this.creek = creek;
-  }
-
-  reset(value) {
+  reset = value => {
     if (!value) {
       this.keys = {};
       this.mouse = {};
@@ -119,90 +127,74 @@ class Controls {
       this.keys = value.keys;
       this.mouse = value.mouse;
     }
-  }
+  };
 
-  set(store, id, pressed) {
+  set_store = (store, id, pressed) => {
     store[id] = {
-      pressed: pressed,
-      time: this.creek.get("time").get_ticks()
+      pressed,
+      time: this.creek.time.get_ticks()
     };
 
     if (navigator.maxTouchPoints !== 0) {
       return false;
     }
     return true;
-  }
+  };
 
-  set_coords(x, y) {
+  set_coords = (x, y) => {
     this.mouse.x = x;
     this.mouse.y = y;
     return false;
   }
 
-  get_key(id) {
-    return {
-      id: id,
-      pressed: this.keys[id] ? this.keys[id].pressed : null,
-      time: this.keys[id] ? this.keys[id].time : null
-    };
-  }
+  get_key = id => ({
+    id,
+    pressed: this.keys[id] ? this.keys[id].pressed : null,
+    time: this.keys[id] ? this.keys[id].time : null
+  });
 
-  get_mouse(id = 1) {
-    return {
-      id: id,
-      pressed: this.mouse[id] ? this.mouse[id].pressed : null,
-      time: this.mouse[id] ? this.mouse[id].time : null,
-      x: this.mouse.x,
-      y: this.mouse.y
-    };
-  }
+  get_mouse = (id = 1) => ({
+    id,
+    pressed: this.mouse[id] ? this.mouse[id].pressed : null,
+    time: this.mouse[id] ? this.mouse[id].time : null,
+    x: this.mouse.x,
+    y: this.mouse.y
+  });
 
-  check_key(id) {
-    return this.get_key(id).pressed;
-  }
-
-  check_mouse(id) {
-    return this.get_mouse(id).pressed;
-  }
+  check_key = id => this.get_key(id).pressed;
+  check_mouse = id => this.get_mouse(id).pressed;
 }
 
 class Updater {
-  constructor() {
-    this.list = null;
-  }
-
-  init(creek) {
+  init = creek => {
     this.creek = creek;
-    this.controls = creek.get("controls");
-    this.data = creek.get("data");
-    this.entities = creek.get("entities");
-  }
+    this.controls = creek.controls;
+    this.data = creek.data;
+    this.entities = creek.entities;
+  };
 
-  update() {
-    this.list = this.entities.get();
-
-    for (const element of this.list) {
+  update = () => {
+    for (const element of this.entities.list) {
       if (
         this.controls.check_key("ShiftLeft") &&
         this.controls.check_key("Backquote")
       ) {
         debugger;
       }
-      if (this.data.get("break_update_loop") === true) {
+      if (this.data.break_update_loop === true) {
         console.log("update loop broken out of");
         break;
       }
 
       element.update(this.creek);
     }
-  }
+  };
 }
 
-class Context {
-  constructor() {}
-
-  set_max_size() {
+class ContextManager {
+  set_max_size = () => {
     const canvas = document.getElementById("canvas");
+    this.canvas = canvas;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     if (navigator.maxTouchPoints !== 0) {
@@ -214,22 +206,10 @@ class Context {
     this.height = canvas.height;
   }
 
-  init(creek) {
+  init = creek => {
     this.set_max_size();
     window.addEventListener("resize", event => this.set_max_size());
-  }
-
-  get() {
-    return this.context;
-  }
-
-  get_width() {
-    return this.width;
-  }
-
-  get_height() {
-    return this.height;
-  }
+  };
 }
 
 class Drawer {
@@ -237,73 +217,65 @@ class Drawer {
     this.list = null;
   }
 
-  init(creek) {
-    this.context = creek.get("context");
-    this.data = creek.get("data");
-    this.entities = creek.get("entities");
+  init = creek => {
+    this.context_manager = creek.context_manager;
+    this.entities = creek.entities;
   }
 
   draw(interpolation) {
-    const context = this.context.get();
-    this.list = this.entities.get();
-
     //    context.clearRect(0, 0, this.context.get_width(), this.context.get_height());
-    this.list.forEach(element => {
-      element.draw(context, interpolation);
-    });
+    for (const element of this.entities.list) {
+      element.draw(this.context_manager.context, interpolation);
+    }
   }
 }
 
 class Entities {
-  constructor() {
-    this.list = null;
-  }
+  init = creek => {
+    this.data = creek.data;
+  };
 
-  init(creek) {
-    this.data = creek.get("data");
-  }
-
-  get() {
-    this.list = this.data.get("entity_list");
-    return this.list;
+  get list () {
+    return this.data.entity_list;
   }
 }
 
 class Data {
   constructor() {
     this.data = {};
-  }
-
-  get(id) {
-    return this.data[id];
-  }
-
-  set(id, val) {
-    return (this.data[id] = val);
+    return new Proxy(this, {
+      get: (target, property) => {
+        return this.data[property];
+      },
+      set: (target, property, value) => {
+        this.data[property] = value;
+        return true;
+      }
+    });
   }
 }
 
 class Looper {
   constructor() {}
 
-  init(creek) {
-    this.data = creek.get("data");
-    this.time = creek.get("time");
-    this.updater = creek.get("updater");
-    this.drawer = creek.get("drawer");
-  }
+  init = creek => {
+    this.data = creek.data;
+    this.time = creek.time;
+    this.updater = creek.updater;
+    this.drawer = creek.drawer;
+  };
 
-  loop(creek) {
-    const max_frame_skip = 5,
-      ticks_per_second = 25,
-      skip_ticks = 1000 / ticks_per_second;
+  loop = creek => {
+    const max_frame_skip = 5;
+    const ticks_per_second = 25;
+    const skip_ticks = 1000 / ticks_per_second;
 
-    let next_game_tick = this.time.get_ticks(),
-      running = true,
-      loops = 0,
-      interpolation = 0;
+    let next_game_tick = this.time.get_ticks();
+    let running = true;
+    let loops = 0;
+    let interpolation = 0;
 
-    this.data.set("game_running", running);
+    this.data.game_running = running;
     this.time.set_ticks();
 
     const inner_loop = () => {
@@ -315,15 +287,15 @@ class Looper {
         loops += 1;
       }
 
-      if (this.data.get("break_update_loop") === true) {
-        this.data.set("break_update_loop", false);
+      if (this.data.break_update_loop === true) {
+        this.data.break_update_loop = false;
       } else {
         interpolation =
           (this.time.get_ticks() + skip_ticks - next_game_tick) / skip_ticks;
         this.drawer.draw(interpolation);
       }
 
-      if (this.data.get("game_running")) {
+      if (this.data.game_running) {
         requestAnimationFrame(inner_loop);
       } else {
         console.log("graceful shutdown complete.");
@@ -331,7 +303,7 @@ class Looper {
     };
 
     requestAnimationFrame(inner_loop);
-  }
+  };
 }
 
 export default Creek;

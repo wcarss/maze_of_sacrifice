@@ -1,3 +1,5 @@
+"use strict";
+
 class Audio {
   constructor() {
     this.creek = null;
@@ -11,16 +13,35 @@ class Audio {
     this.all_muted = false;
   }
 
-  init(creek) {
+  init = creek => {
     console.log("AudioManager init.");
     this.creek = creek;
     // this.resource_manager = creek.get('resource');
-    this.load_clips(creek.get("resources").get_sounds());
-  }
+    this.load_clips(creek.resources.get_sounds());
+  };
 
-  get_clip(clip_id) {
-    let sounds = null;
+  load_clips = loaded_clips => {
+    if (this.clips === null) {
+      this.clips = {};
+    }
+
+    for (const clip_id in loaded_clips) {
+      const loaded_clip = loaded_clips[clip_id];
+      console.log("loading clip " + loaded_clip.id);
+      const clip = new Clip(loaded_clip.id, loaded_clip.url, loaded_clip.element);
+
+      if (this.clips && this.clips[clip.id]) {
+        console.log("attempted to load multiple identical clip ids");
+        debugger;
+      }
+
+      this.clips[clip.id] = clip;
+    }
+  };
+
+  get_clip = clip_id => {
     /* Pulling the below out. Not sure if I want creek to work this way any more.
+     *  let sounds = null;
      *
      *  if (clips === null) {
      *    sounds = this.resource_manager.get_resources()['sound'];
@@ -33,179 +54,63 @@ class Audio {
      *  }
      *
      */
+    const clip = this.clips[clip_id];
 
-    if (!this.clips[clip_id]) {
+    if (!clip) {
       console.log(
         "attempting to get clip: " + clip_id + " that wasn't found in clips"
       );
     }
 
-    return this.clips[clip_id];
-  }
+    return clip;
+  };
 
-  play(clip_id) {
-    let clip = this.get_clip(clip_id);
-    if (!clip) {
-      console.log("failed to play audio clip: " + clip_id);
-      return;
-    }
-    clip.play();
-  }
+  play = clip_id => this.get_clip(clip_id).play();
+  pause = clip_id => this.get_clip(clip_id).pause();
+  playing = clip_id => this.get_clip(clip_id).playing();
+  paused = clip_id => this.get_clip(clip_id).paused();
+  stop = clip_id => this.get_clip(clip_id).stop();
 
-  pause(clip_id) {
-    let clip = this.get_clip(clip_id);
-    if (!clip) {
-      console.log("failed to pause audio clip: " + clip_id);
-      return;
-    }
-    clip.pause();
-  }
+  volume = (clip_id, level) => this.get_clip(clip_id).volume(level);
+  get_volume = clip_id => this.get_clip(clip_id).get_volume();
 
-  stop(clip_id) {
-    let clip = this.get_clip(clip_id);
-    if (!clip) {
-      console.log("failed to stop audio clip: " + clip_id);
-      return;
-    }
-    clip.stop();
-  }
+  set_time = (clip_id, time) => this.get_clip(clip_id).set_time(time);
+  get_time = clip_id => this.get_clip(clip_id).get_time();
 
-  volume(clip_id, level) {
-    let clip = this.get_clip(clip_id);
-    clip.volume(level);
-  }
+  mute = clip_id => this.get_clip(clip_id).mute();
+  unmute = clip_id => this.get_clip(clip_id).unmute();
+  muted = clip_id => this.get_clip(clip_id).muted();
 
-  set_time(clip_id, time) {
-    let clip = this.get_clip(clip_id);
-    clip.set_time(time);
-  }
+  loop = (clip_id, looping_bool) => this.get_clip(clip_id).loop(looping_bool);
+  looping = clip_id => this.get_clip(clip_id).looping();
+  duration = clip_id => this.get_clip(clip_id).duration();
 
-  mute(clip_id) {
-    let clip = this.get_clip(clip_id);
-    clip.mute();
-  }
-
-  unmute(clip_id) {
-    let clip = this.get_clip(clip_id);
-    clip.unmute();
-  }
-
-  loop(clip_id, looping_bool) {
-    let clip = this.get_clip(clip_id);
-    clip.loop(looping_bool);
-  }
-
-  playing(clip_id) {
-    let clip = this.get_clip(clip_id);
-    return clip.playing();
-  }
-
-  paused(clip_id) {
-    let clip = this.get_clip(clip_id);
-    return clip.paused();
-  }
-
-  get_volume(clip_id) {
-    let clip = this.get_clip(clip_id);
-    return clip.get_volume();
-  }
-
-  get_time(clip_id) {
-    let clip = this.get_clip(clip_id);
-    return clip.get_time();
-  }
-
-  muted(clip_id) {
-    let clip = this.get_clip(clip_id);
-    return clip.muted();
-  }
-
-  looping(clip_id) {
-    let clip = this.get_clip(clip_id);
-    return clip.looping();
-  }
-
-  duration(clip_id) {
-    let clip = this.get_clip(clip_id);
-    return clip.duration();
-  }
-
-  pause_all() {
-    let i = null;
-    for (i in this.clips) {
-      if (this.clips[i].playing()) {
-        this.clips[i].pause();
-        this.currently_paused.push(this.clips[i].id);
+  pause_all = () => {
+    for (const clip of Object.values(this.clips)) {
+      if (clip.playing()) {
+        clip.pause();
+        this.currently_paused.push(clip.id);
       }
     }
-  }
-
-  unpause_all() {
-    let i = null;
-    for (i in this.currently_paused) {
-      this.get_clip(this.currently_paused[i]).play();
+  };
+  unpause_all = () => {
+    for (const clip_id of this.currently_paused) {
+      this.get_clip(clip_id).play();
     }
     this.currently_paused = [];
-  }
+  };
+  stop_all = () => Object.values(this.clips).map(clip => clip.stop(level));
 
-  stop_all() {
-    let i = null;
-    for (i in this.clips) {
-      this.clips[i].stop();
-    }
-  }
-
-  volume_all(level) {
-    let i = null;
-    for (i in this.clips) {
-      this.clips[i].volume(level);
-    }
-  }
-
-  mute_all(level) {
-    let i = null;
-    for (i in this.clips) {
-      this.clips[i].mute();
-    }
+  volume_all = level => Object.values(this.clips).map(clip => clip.volume(level));
+  mute_all = level => {
+    Object.values(this.clips).map(clip => clip.mute());
     this.all_muted = true;
-  }
-
-  unmute_all(level) {
-    let i = null;
-    for (i in this.clips) {
-      this.clips[i].unmute();
-    }
+  };
+  unmute_all = level => {
+    Object.values(this.clips).map(clip => clip.unmute());
     this.all_muted = false;
-  }
-
-  are_all_muted() {
-    return this.all_muted;
-  }
-
-  load_clips(loaded_clips) {
-    let clip = null,
-      clip_id = null,
-      i = null;
-
-    if (this.clips === null) {
-      this.clips = {};
-    }
-
-    for (i in loaded_clips) {
-      clip_id = loaded_clips[i].id;
-
-      console.log("loading clip " + clip_id);
-
-      clip = new Clip(clip_id, loaded_clips[i].url, loaded_clips[i].element);
-
-      if (this.clips && this.clips[clip_id]) {
-        console.log("attempted to load multiple identical clip ids");
-        debugger;
-      }
-
-      this.clips[clip_id] = clip;
-    }
-  }
+  };
+  are_all_muted = () => this.all_muted;
 }
 
 class Clip {
@@ -215,66 +120,28 @@ class Clip {
     this.element = element;
   }
 
-  play() {
-    this.element.play();
-  }
-
-  pause() {
-    this.element.pause();
-  }
-
-  stop() {
-    this.element.pause();
+  play = () => this.element.play();
+  pause = () => this.element.pause();
+  stop = () => {
     this.element.currentTime = 0;
-  }
+    this.element.pause();
+  };
+  playing = () => !this.element.paused;
+  paused = () => this.element.paused;
 
-  volume(level) {
-    this.element.volume = level;
-  }
+  volume = level => this.element.volume = level;
+  get_volume = () => this.element.volume;
 
-  set_time(time) {
-    this.element.currentTime = time;
-  }
+  get_time = () => this.element.currentTime;
+  set_time = time => this.element.currentTime = time;
+  duration = () => this.element.duration;
 
-  mute() {
-    this.element.muted = true;
-  }
+  mute = () => this.element.muted = true;
+  unmute = () => this.element.muted = false;
+  muted = () => this.element.muted;
 
-  unmute() {
-    this.element.muted = false;
-  }
-
-  loop(looping_bool) {
-    this.element.loop = looping_bool;
-  }
-
-  playing() {
-    return !this.element.paused;
-  }
-
-  paused() {
-    return this.element.paused;
-  }
-
-  get_volume() {
-    return this.element.volume;
-  }
-
-  get_time() {
-    return this.element.currentTime;
-  }
-
-  muted() {
-    return this.element.muted;
-  }
-
-  looping() {
-    return this.element.looping;
-  }
-
-  duration() {
-    return this.element.duration;
-  }
+  loop = looping_bool => this.element.loop = looping_bool;
+  looping = () => this.element.looping;
 }
 
 export default Audio;

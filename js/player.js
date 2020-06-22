@@ -1,3 +1,5 @@
+"use strict";
+
 import Palettes from "./palettes.js";
 
 class Player {
@@ -23,25 +25,23 @@ class Player {
     this.level = 0;
   }
 
-  init(creek) {
+  init = creek => {
     this.creek = creek;
-    creek.get("utilities").setup_throttle("player_attack", 300);
-    creek.get("utilities").setup_throttle("player_move", 90);
-    creek.get("utilities").setup_throttle("player_pause", 90);
-  }
+    creek.utilities.setup_throttle("player_attack", 300);
+    creek.utilities.setup_throttle("player_move", 90);
+    creek.utilities.setup_throttle("player_pause", 90);
+  };
 
-  get_key(x, y) {
-    return `${x}-${y}`;
-  }
+  get_key = (x, y) => `${x}-${y}`;
 
-  draw(context, interpolation) {
-    let size = null,
-      x = null,
-      y = null,
-      ticks = this.creek.get("time").ticks,
-      prev = null;
+  draw = (context, interpolation) => {
+    let size = null;
+    let x = null;
+    let y = null;
+    let ticks = this.creek.time.ticks;
+    let prev = null;
+    let player = this.creek.resources.get_image("player");
 
-    let player = this.creek.get("resources").get_image("player");
     context.fillStyle = "red";
     context.fillRect(
       this.x * this.x_size,
@@ -73,8 +73,8 @@ class Player {
     );
 
     if (this.health < 1) {
-      const data = this.creek.get("data");
-      const map = data.get("maps").current_map;
+      const data = this.creek.data;
+      const map = data.maps.current_map;
       const mid_map_height = map.pixel_height / 2 + 30; // half of map height w/ 1-tile offset
       const mid_map_width = map.pixel_width / 2 + 30; // half of map width w/ 1-tile offset
 
@@ -126,31 +126,31 @@ class Player {
     }
   }
 
-  update(creek) {
-    const time = creek.get("time"),
-      controls = creek.get("controls"),
-      maze = creek.get("data").get("maze"),
-      enemies = creek.get("data").get("enemies"),
-      utilities = creek.get("utilities"),
-      key = maze.get_key,
-      tile = maze.tiles[key(this.x, this.y)],
-      n = maze.tiles[key(this.x, this.y - 1)],
-      s = maze.tiles[key(this.x, this.y + 1)],
-      e = maze.tiles[key(this.x + 1, this.y)],
-      w = maze.tiles[key(this.x - 1, this.y)],
-      nw = maze.tiles[key(this.x - 1, this.y - 1)],
-      ne = maze.tiles[key(this.x + 1, this.y - 1)],
-      sw = maze.tiles[key(this.x - 1, this.y + 1)],
-      se = maze.tiles[key(this.x + 1, this.y + 1)];
+  update = creek => {
+    const time = creek.time;
+    const controls = creek.controls;
+    const maze = creek.data.maze;
+    const enemies = creek.data.enemies;
+    const utilities = creek.utilities;
+    const key = maze.get_key;
+    const tile = maze.tiles[key(this.x, this.y)];
+    const n = maze.tiles[key(this.x, this.y - 1)];
+    const s = maze.tiles[key(this.x, this.y + 1)];
+    const e = maze.tiles[key(this.x + 1, this.y)];
+    const w = maze.tiles[key(this.x - 1, this.y)];
+    const nw = maze.tiles[key(this.x - 1, this.y - 1)];
+    const ne = maze.tiles[key(this.x + 1, this.y - 1)];
+    const sw = maze.tiles[key(this.x - 1, this.y + 1)];
+    const se = maze.tiles[key(this.x + 1, this.y + 1)];
 
     if (!n) debugger;
 
-    let new_x = this.x,
-      new_y = this.y,
-      move_distance = 1,
-      vdir = null,
-      hdir = null,
-      prev_check = null;
+    let new_x = this.x;
+    let new_y = this.y;
+    let move_distance = 1;
+    let vdir = null;
+    let hdir = null;
+    let prev_check = null;
 
     if (
       (controls.check_key("Escape") || controls.check_key("KeyP")) &&
@@ -158,9 +158,9 @@ class Player {
     ) {
       this.paused = !this.paused;
       if (this.paused) {
-        creek.get("audio").pause_all();
+        creek.audio.pause_all();
       } else {
-        creek.get("audio").unpause_all();
+        creek.audio.unpause_all();
       }
     }
 
@@ -169,15 +169,15 @@ class Player {
     if (controls.check_key("KeyM") && utilities.use_throttle("player_pause")) {
       this.muted = !this.muted;
       if (this.muted) {
-        creek.get("audio").mute_all();
+        creek.audio.mute_all();
       } else {
-        creek.get("audio").unmute_all();
+        creek.audio.unmute_all();
       }
     }
 
     if (this.health < 1) {
       console.log("player lost!");
-      creek.get("data").set("game_running", false);
+      creek.data.game_running = false;
     }
 
     if (
@@ -185,7 +185,7 @@ class Player {
       utilities.use_throttle("player_attack")
     ) {
       enemies.give_damage_xy(this.x, this.y);
-      creek.get("audio").play("slash");
+      creek.audio.play("slash");
     }
 
     if (controls.check_key("ArrowUp")) {
@@ -202,13 +202,13 @@ class Player {
 
     if (navigator.maxTouchPoints !== 0) {
       let mouse = controls.get_mouse();
-      let context = creek.get("context"),
-        width = context.get_width(),
-        height = context.get_height(),
-        third_x = width / 3,
-        third_y = height / 3,
-        top_third_x = width - third_x,
-        top_third_y = height - third_y;
+      let context = creek.context_manager;
+      let width = context_manager.width;
+      let height = context_manager.height;
+      let third_x = width / 3;
+      let third_y = height / 3;
+      let top_third_x = width - third_x;
+      let top_third_y = height - third_y;
 
       if (!mouse.pressed) {
         return;

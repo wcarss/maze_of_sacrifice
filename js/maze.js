@@ -1,19 +1,15 @@
-class Maze {
-  random_int(n) {
-    return parseInt(Math.floor(Math.random() * n));
-  }
+"use strict";
 
-  shuffle(a) {
+class Maze {
+  random_int = n => parseInt(Math.floor(Math.random() * n));
+  shuffle = a => {
     for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
-  }
-
-  get_key(x, y) {
-    return `tile_${x}_${y}`;
-  }
+  };
+  get_key = (x, y) => `tile_${x}_${y}`;
 
   constructor(creek, id, width, height, size) {
     this.creek = creek;
@@ -46,33 +42,33 @@ class Maze {
     this.generate();
   }
 
-  next_index(num) {
+  next_index = num => {
     if (Math.random() > 0.25) {
       return num - 1;
     } else {
       return this.random_int(num);
     }
-  }
+  };
 
-  generate() {
-    let index = null,
-      x = null,
-      y = null,
-      nx = null,
-      ny = null,
-      dir = null,
-      dir_index = null,
-      count = 0;
+  generate = () => {
+    let index = null;
+    let x = null;
+    let y = null;
+    let nx = null;
+    let ny = null;
+    let dir = null;
+    let dir_index = null;
+    let count = 0;
 
-    const random_int = this.random_int,
-      get_key = this.get_key,
-      shuffle = this.shuffle,
-      dx = this.dx,
-      dy = this.dy,
-      directions = this.directions,
-      opposite = this.opposite,
-      cells = this.cells,
-      tiles = this.tiles;
+    const random_int = this.random_int;
+    const get_key = this.get_key;
+    const shuffle = this.shuffle;
+    const dx = this.dx;
+    const dy = this.dy;
+    const directions = this.directions;
+    const opposite = this.opposite;
+    const cells = this.cells;
+    const tiles = this.tiles;
 
     x = random_int(this.width - 1) + 1;
     y = random_int(this.height - 1) + 1;
@@ -168,14 +164,14 @@ class Maze {
       }
     }
 
-    let n = null,
-      s = null,
-      e = null,
-      w = null,
-      ne = null,
-      nw = null,
-      se = null,
-      sw = null;
+    let n = null;
+    let s = null;
+    let e = null;
+    let w = null;
+    let ne = null;
+    let nw = null;
+    let se = null;
+    let sw = null;
     for (let i = 3; i < this.width * 2 - 2; i++) {
       for (let j = 3; j < this.height * 2 - 2; j++) {
         tile = new_tiles[get_key(i, j)];
@@ -195,9 +191,9 @@ class Maze {
     }
 
     this.tiles = new_tiles;
-  }
+  };
 
-  visit(x, y, n, mark_dirty) {
+  visit = (x, y, n, mark_dirty) => {
     let tile = this.tiles[this.get_key(x, y)];
     if (!tile) debugger;
 
@@ -211,9 +207,9 @@ class Maze {
     this.visit(x, y + 1, n - 1);
     this.visit(x + 1, y, n - 1);
     this.visit(x - 1, y, n - 1);
-  }
+  };
 
-  reveal(x, y, n) {
+  reveal = (x, y, n) => {
     let tile = this.tiles[this.get_key(x, y)];
     if (!tile) return;
     tile.revealed = true;
@@ -227,13 +223,11 @@ class Maze {
     this.reveal(x, y + 1, n - 1);
     this.reveal(x + 1, y, n - 1);
     this.reveal(x - 1, y, n - 1);
-  }
+  };
 }
 
 class Tile {
-  get_key(x, y) {
-    return `tile_${x}_${y}`;
-  }
+  get_key = (x, y) => `tile_${x}_${y}`;
 
   constructor(creek, x, y, size) {
     this.creek = creek;
@@ -255,7 +249,7 @@ class Tile {
     this.layer = 2;
   }
 
-  draw(context, interpolation) {
+  draw = (context, interpolation) => {
     context.fillStyle = "black";
     if (!this.visited && !this.revealed) {
       context.fillRect(this.x, this.y, this.x_size, this.y_size);
@@ -280,9 +274,9 @@ class Tile {
       context.fillRect(this.x, this.y, this.x_size, this.y_size);
       context.globalAlpha = 1;
     }
-  }
+  };
 
-  update(creek) {}
+  update = creek => {};
 }
 
 class NewTile extends Tile {
@@ -291,9 +285,9 @@ class NewTile extends Tile {
     this.wall = wall;
   }
 
-  draw(context, interpolation) {
-    let tree = this.creek.get("resources").get_image("tree"),
-      grass = this.creek.get("resources").get_image("grass");
+  draw = (context, interpolation) => {
+    const tree = this.creek.resources.get_image("tree");
+    const grass = this.creek.resources.get_image("grass");
 
     context.drawImage(grass.img, this.x, this.y, this.x_size, this.y_size);
     if (this.wall) {
@@ -309,7 +303,7 @@ class NewTile extends Tile {
         context.globalAlpha = 1;
       }
     }
-  }
+  };
 }
 
 export default Maze;

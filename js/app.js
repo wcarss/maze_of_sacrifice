@@ -12,11 +12,11 @@ window.onload = async () => {
   const player = new Player();
   const maps = new Maps(12);
 
-  await creek.get("resources").init(creek, Resources, player, maps);
+  await creek.resources.init(creek, Resources, player, maps);
 
   creek.init([player, maps]);
   creek.run();
-  creek.get("data").set("player", player);
-  creek.get("data").set("maps", maps);
+  creek.data.player = player;
+  creek.data.maps = maps;
   maps.change_map(maps.make_id(0));
 };

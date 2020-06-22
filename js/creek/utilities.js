@@ -5,85 +5,40 @@ class Utilities {
     this.THROTTLE_KEY = "_util_throttles";
   }
 
-  init(creek) {
+  init = creek => {
     this.creek = creek;
-    this.data = creek.get("data");
-    this.time = creek.get("time");
-    this.data.set(this.THROTTLE_KEY, {});
-  }
+    this.data = creek.data;
+    this.time = creek.time;
+    this.data[this.THROTTLE_KEY] = {};
+  };
 
-  get_key(a, b) {
-    return `${a}_${b}`;
-  }
+  get_key = (a, b) => `${a}_${b}`;
+  random_int = n => parseInt(Math.floor(Math.random() * n));
+  random_choice = arr => arr[this.random_int(arr.length)];
 
-  random_int(n) {
-    return parseInt(Math.floor(Math.random() * n));
-  }
-
-  random_choice(arr) {
-    return arr[this.random_int(arr.length)];
-  }
-
-  get_throttle(id) {
-    let data = this.creek.get("data"),
-      throttles = null;
-
-    if (!data) {
-      return null;
-    }
-
-    throttles = this.data.get(this.THROTTLE_KEY);
-
-    if (!throttles) {
-      return null;
-    }
-
-    return throttles[id];
-  }
-
-  set_throttle(id, throttle) {
-    let throttles = this.creek.get("data").get(this.THROTTLE_KEY);
+  get_throttle = id => this.creek.data[this.THROTTLE_KEY][id];
+  clear_throttle = id => delete this.creek.data[this.THROTTLE_KEY][id];
+  setup_throttle = (id, limit = 0, func = null, args = null, timestamp = 0) => {
+    const throttles = this.creek.data[this.THROTTLE_KEY];
 
     if (throttles[id]) {
       console.warn(`setting a throttle '${id}' that already exists`);
       debugger;
     }
 
-    throttles[id] = throttle;
-  }
-
-  clear_throttle(id) {
-    let throttles = this.creek.get("data").get(this.THROTTLE_KEY);
-
-    if (throttles[id]) {
-      delete throttles[id];
-    }
-  }
-
-  setup_throttle(id, limit, func, args, timestamp) {
-    let throttle = this.get_throttle(id);
-
-    if (throttle) {
-      console.warn(`tried to setup a throttle '${id}' that already exists.`);
-      debugger;
-    }
-
-    throttle = {
-      id: id,
-      timestamp: timestamp || 0,
-      limit: limit || 0,
-      func: func || null,
-      args: args || null,
+    throttles[id] = {
+      id,
+      timestamp,
+      limit,
+      func,
+      args,
       invoke_count: 0,
-      run_count: 0
+      run_count: 0,
     };
-
-    this.set_throttle(id, throttle);
-  }
-
-  use_throttle(id, func, args, limit, timestamp) {
-    let throttle = this.get_throttle(id),
-      return_value = null;
+  };
+  use_throttle = (id, func, args, limit, timestamp) => {
+    const throttle = this.get_throttle(id);
+    let return_value = null;
 
     if (!throttle) {
       console.warn(`tried to use a throttle '${id}' that does not exist`);

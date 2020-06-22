@@ -1,11 +1,9 @@
-function random_int(num) {
-  return parseInt(Math.floor(Math.random() * num));
-}
+"use strict";
+
+const random_int = num => parseInt(Math.floor(Math.random() * num));
 
 class Enemies {
-  get_key(x, y) {
-    return `${x}_${y}`;
-  }
+  get_key = (x, y) => `${x}_${y}`;
 
   constructor(creek, number, width, height, size, maze) {
     this.creek = creek;
@@ -18,9 +16,9 @@ class Enemies {
     this.map_height = height;
     this.enemy_id_lookup = {};
 
-    let x = random_int(width - 1) + 1,
-      y = random_int(height - 1) + 1,
-      positions = {};
+    let x = random_int(width - 1) + 1;
+    let y = random_int(height - 1) + 1;
+    const positions = {};
 
     positions[this.get_key(2, 2)] = true;
     positions[this.get_key(width - 2, height - 2)] = true;
@@ -43,15 +41,10 @@ class Enemies {
     const sounds = {};
   }
 
-  get_enemies() {
-    return this.enemies;
-  }
+  get_enemies = () => this.enemies;
+  get_enemy = id => this.enemies[this.enemy_id_lookup[id]];
 
-  get_enemy(id) {
-    return this.enemies[this.enemy_id_lookup[id]];
-  }
-
-  give_damage_xy(x, y) {
+  give_damage_xy = (x, y) => {
     let enemy = null;
 
     for (let enemy_index in this.enemies) {
@@ -84,15 +77,15 @@ class Enemy {
     this.moved_at = 0;
   }
 
-  draw(context, interpolation) {
-    let skeleton = this.creek.get("resources").get_image("skeleton"),
-      maze = this.creek.get("data").get("maze"),
-      tile = maze.tiles[maze.get_key(this.x, this.y)];
+  draw = (context, interpolation) => {
+    let skeleton = this.creek.resources.get_image("skeleton");
+    let maze = this.creek.data.maze;
+    let tile = maze.tiles[maze.get_key(this.x, this.y)];
 
     if (this.active) {
-      skeleton = this.creek.get("resources").get_image("skeleton");
+      skeleton = this.creek.resources.get_image("skeleton");
     } else {
-      skeleton = this.creek.get("resources").get_image("bones");
+      skeleton = this.creek.resources.get_image("bones");
     }
 
     if (tile.visited && this.active) {
@@ -131,24 +124,24 @@ class Enemy {
       );
       context.globalAlpha = 1;
     }
-  }
+  };
 
-  set_new_destination() {
+  set_new_destination = () => {
     this.destination.x = 1;
     this.destination.y = 1;
-  }
+  };
 
-  give_damage() {
+  give_damage = () => {
     console.log(`${this.id} takes 1 damage, health is ${this.health}`);
-    this.creek.get("audio").play("bwuh_low");
+    this.creek.audio.play("bwuh_low");
     this.health -= 1;
-  }
+  };
 
-  update(creek) {
-    const time = creek.get("time"),
-      player = creek.get("data").get("player"),
-      maze = creek.get("data").get("maze"),
-      key = maze.get_key;
+  update = creek => {
+    const time = creek.time;
+    const player = creek.data.player;
+    const maze = creek.data.maze;
+    const key = maze.get_key;
 
     if (!this.active) return;
     if (player.paused) return;
@@ -195,12 +188,12 @@ class Enemy {
         );
         this.last_color = this.color;
         this.color = "white";
-        creek.get("audio").play("bwuh_2");
+        creek.audio.play("bwuh_2");
         this.x = this.last_x;
         this.y = this.last_y;
       }
     }
-  }
+  };
 }
 
 export default Enemies;
