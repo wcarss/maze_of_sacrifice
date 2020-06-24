@@ -12,23 +12,19 @@ class Camera {
       y: 0,
       //width: 1344,
       //height: 768,
-      width: 300,
-      height: 300,
-      left_margin: 120,
-      right_margin: 120,
-      top_margin: 120,
-      bottom_margin: 120,
+      width: 0,
+      height: 0,
+      left_margin: 0,
+      right_margin: 0,
+      top_margin: 0,
+      bottom_margin: 0,
+      fullscreen: true,
     };
     this.width = this.camera_config.width;
     this.height = this.camera_config.height;
 
     this.fullscreen = this.camera_config.fullscreen || false;
     this.context_manager = this.creek.context_manager;
-
-    if (this.fullscreen) {
-      this.width = this.context_manager.width;
-      this.height = this.context_manager.height;
-    }
 
     this.camera = {
       inner_x: this.camera_config.x-this.width/4,
@@ -48,6 +44,14 @@ class Camera {
     };
   };
 
+  prep = () => {
+    if (this.fullscreen) {
+      this.width = this.context_manager.width;
+      this.height = this.context_manager.height;
+    }
+    this.resize();
+  };
+
   get offset () {
     return {
       x: this.camera.x,
@@ -65,7 +69,7 @@ class Camera {
   }
 
   draw = (context, interpolation) => {
-    const r = this.rect;
+    //const r = this.rect;
     //context.strokeStyle = "blue";
     //context.strokeRect(r.x, r.y, r.x_size, r.y_size);
   };
@@ -74,6 +78,8 @@ class Camera {
     let camera = this.camera;
     let new_camera_x = camera.x;
     let new_camera_y = camera.y;
+    camera.desired_center_x = center_x;
+    camera.desired_center_y = center_y;
 
     if (center_x > camera.inner_x + camera.inner_width) {
       new_camera_x += (center_x - (camera.inner_x + camera.inner_width));
@@ -92,14 +98,15 @@ class Camera {
 
   move = (x, y) => {
     const camera = this.camera;
-    const context_manager = this.context_manager;
-    if (this.fullscreen && camera.width !== context_manager.width) {
-      this.resize(context_manager.width, context_manager.height);
-    }
 
-    // todo: handle bounds
-    //const bounds = creek.data.maps.get_bounds();
-    const map = this.data.maps.current_map || {pixel_width: camera.width, pixel_height: camera.height};
+    // this should be in the _game_'s logic, not the engine's
+    const map = this.data.maps && this.data.maps.current_map
+      ? this.data.maps.current_map
+      : {
+          pixel_width: camera.width,
+          pixel_height: camera.height
+        };
+
     x = this.utils.clamp(x, 0, map.pixel_width - camera.width);
     y = this.utils.clamp(y, 0, map.pixel_height - camera.height);
 
@@ -111,12 +118,22 @@ class Camera {
 
   resize = (width, height) => {
     const camera = this.camera;
+    const context_manager = this.context_manager;
+    if (this.fullscreen && camera.width !== context_manager.width || camera.height !== context_manager.height) {
+      width = context_manager.width;
+      height = context_manager.height;
+    }
     camera.width = width;
     camera.height = height;
     camera.x_size = width;
     camera.y_size = height;
     camera.inner_width = width / 2;
     camera.inner_height = height / 2;
+    if (camera.desired_center_x && camera.desired_center_y) {
+      this.center(camera.desired_center_x, camera.desired_center_y);
+    } else {
+      this.move(camera.x, camera.y);
+    }
   };
 }
 

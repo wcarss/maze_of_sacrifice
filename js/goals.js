@@ -36,7 +36,7 @@ class Start {
     const maps = data.maps;
     const current_map = maps.current_map;
     const last_map_id = current_map.last_map_id;
-    const context_manager = creek.context_manager;
+    const drawer = creek.drawer;
 
     if (
       controls.check_key("Space") &&
@@ -45,12 +45,7 @@ class Start {
       player.y === this.y &&
       (player.last_x && player.last_y)
     ) {
-      context_manager.context.clearRect(
-        0,
-        0,
-        context_manager.width,
-        context_manager.height
-      );
+      drawer.clearScreen();
       creek.audio.play("level");
       current_map.exit_x = this.x;
       current_map.exit_y = this.y;
@@ -109,7 +104,7 @@ class End {
     const current_map_id = data.maps.current_map_id;
     const current_map = data.maps.current_map;
     const next_map_id = current_map.next_map_id;
-    const context_manager = creek.context_manager;
+    const drawer = creek.drawer;
 
     if (player.paused) return;
 
@@ -119,12 +114,7 @@ class End {
       player.y === this.y &&
       (player.last_x && player.last_y)
     ) {
-      context_manager.context.clearRect(
-        0,
-        0,
-        context_manager.width,
-        context_manager.height
-      );
+      drawer.clearScreen();
       creek.audio.play("level");
       current_map.exit_x = this.x;
       current_map.exit_y = this.y;

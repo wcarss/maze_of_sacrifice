@@ -201,9 +201,12 @@ class ContextManager {
     this.height = canvas.height;
   }
 
-  init = creek => {
+  prep = () => {
     this.set_max_size();
-    window.addEventListener("resize", event => this.set_max_size());
+  }
+
+  init = creek => {
+    this.creek = creek;
   };
 }
 
@@ -217,10 +220,29 @@ class Drawer {
     this.physics = creek.physics;
     this.camera = creek.camera;
     this.entities = creek.entities;
+    window.addEventListener("resize", event => this.prep());
   }
 
+  // prep for first render
+  prep = () => {
+    this.context_manager.prep();
+    this.camera.prep();
+  };
+
+  clearScreen = () => {
+    const context_manager = this.context_manager;
+    const storedTransform = context_manager.context.getTransform();
+    context_manager.context.setTransform(1,0,0,1,0,0);
+    context_manager.context.clearRect(
+      0,
+      0,
+      context_manager.width,
+      context_manager.height
+    );
+    context_manager.context.setTransform(storedTransform);
+  };
+
   draw(interpolation) {
-    this.context_manager.context.clearRect(0, 0, this.context_manager.width, this.context_manager.height);
     const offset = this.camera.offset;
     this.context_manager.context.setTransform(1,0,0,1, this.camera.camera.left_margin-offset.x, this.camera.camera.top_margin-offset.y);
     for (const element of this.entities.list) {
@@ -278,6 +300,7 @@ class Looper {
     let loops = 0;
     let interpolation = 0;
 
+    this.drawer.prep();
     this.data.game_running = running;
     this.time.set_ticks();
 

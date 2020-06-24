@@ -149,7 +149,7 @@ class Maps {
     console.log('camera x and y:', player.x, ',', player.y);
     console.log(player);
     console.log('alt x and y:', player_x, ',', player_y);
-    this.creek.camera.center(player.x*player.x_size, player.y*player.y_size);
+    this.creek.camera.center(player.x*player.x_size+player.x_size/2, player.y*player.y_size+player.y_size/2);
 
     data.entity_list = map.entity_list;
     data.npcs = map.npcs;

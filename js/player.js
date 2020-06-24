@@ -281,7 +281,7 @@ class Player {
     this.last_y = this.y;
     this.x = new_x;
     this.y = new_y;
-    this.camera.center(this.x*this.x_size, this.y*this.y_size);
+    this.camera.center(this.x*this.x_size+this.x_size/2, this.y*this.y_size+this.y_size/2);
 
     maze.visit(this.x, this.y, 1, true);
     maze.reveal(this.x, this.y, 3);
