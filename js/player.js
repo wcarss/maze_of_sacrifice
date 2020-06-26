@@ -65,6 +65,8 @@ class Player {
       this.x_size,
       this.y_size
     );
+    const transform = context.getTransform();
+    context.setTransform(1,0,0,1,0,0);
     context.clearRect(50, context.canvas.height - 30, 352, 35);
     context.font = "28px serif";
     context.fillStyle = "white";
@@ -73,12 +75,14 @@ class Player {
       70,
       context.canvas.height - 5
     );
+    context.setTransform(transform);
 
     if (this.health < 1) {
       const data = this.creek.data;
       const map = data.maps.current_map;
-      const mid_map_height = map.pixel_height / 2 + 30; // half of map height w/ 1-tile offset
-      const mid_map_width = map.pixel_width / 2 + 30; // half of map width w/ 1-tile offset
+      const camera = this.creek.camera.camera;
+      const half_camera_height = camera.height / 2 + 30; // half of camera height w/ 1-tile offset
+      const half_camera_width = camera.width / 2 + 30; // half of camera width w/ 1-tile offset
 
       context.font = "44px serif";
       const defeatString = `PLAYER DEFEATED!`;
@@ -89,10 +93,10 @@ class Player {
       context.fillStyle = "#222";
 
       context.fillRect(
-        0,
+        camera.x+camera.left_margin,
         // 30px above mid-height, at line-top, and 10px for padding
-        mid_map_height - 30 - defeatMeasure.actualBoundingBoxAscent - 10,
-        map.pixel_width,
+        camera.y+camera.top_margin+half_camera_height - 30 - defeatMeasure.actualBoundingBoxAscent - 10,
+        camera.width,
         // the height of the line above+below + 10px padding above+below
         defeatHeight + 20
       );
@@ -100,8 +104,8 @@ class Player {
 
       context.fillText(
         defeatString,
-        mid_map_width - defeatMeasure.width / 2,
-        mid_map_height - 30
+        camera.x+camera.left_margin + half_camera_width - defeatMeasure.width / 2,
+        camera.y+camera.top_margin + half_camera_height - 30
       );
 
       context.font = "28px serif";
@@ -112,9 +116,9 @@ class Player {
         refreshMeasure.actualBoundingBoxDescent;
       context.fillStyle = "#222";
       context.fillRect(
-        0,
-        mid_map_height + 30 - refreshMeasure.actualBoundingBoxAscent - 10,
-        map.pixel_width,
+        camera.x+camera.left_margin,
+        camera.y+camera.top_margin + half_camera_height + 30 - refreshMeasure.actualBoundingBoxAscent - 10,
+        camera.width,
         // the height of the line above+below + 10px padding above+below
         refreshHeight + 18
       );
@@ -122,8 +126,8 @@ class Player {
 
       context.fillText(
         refreshString,
-        mid_map_width - refreshMeasure.width / 2,
-        mid_map_height + 30
+        camera.x+camera.left_margin + half_camera_width - refreshMeasure.width / 2,
+        camera.y+camera.top_margin + half_camera_height + 30
       );
     }
   }
