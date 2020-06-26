@@ -136,7 +136,6 @@ class Maps {
     }
 
     map.setup_player(player, player_x, player_y);
-    console.log(`setting player.level from ${player.level} to ${map_id}`);
     player.level = map_id;
 
     this.last_map_change = time.ticks;
@@ -146,9 +145,7 @@ class Maps {
     this.next_map_id = this.current_map.next_map_id;
     this.last_map_id = this.current_map.last_map_id;
 
-    console.log('camera x and y:', player.x, ',', player.y);
-    console.log(player);
-    console.log('alt x and y:', player_x, ',', player_y);
+    this.creek.camera.resize(this.current_map.pixel_width, this.current_map.pixel_height);
     this.creek.camera.center(player.x*player.x_size+player.x_size/2, player.y*player.y_size+player.y_size/2);
 
     data.entity_list = map.entity_list;

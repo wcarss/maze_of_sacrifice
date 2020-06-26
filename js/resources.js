@@ -236,7 +236,7 @@ const Resources = [
     32,
     "resources/images/tileset.png",
     304,
-    128,
+    129,
     16,
     16
   ).get(),

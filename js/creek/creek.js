@@ -244,14 +244,18 @@ class Drawer {
 
   draw(interpolation) {
     const offset = this.camera.offset;
-    this.context_manager.context.setTransform(1,0,0,1, this.camera.camera.left_margin-offset.x, this.camera.camera.top_margin-offset.y);
+    const centering_x = parseInt((this.context_manager.width-this.camera.rect.x_size)/2);
+    const centering_y = parseInt((this.context_manager.height-this.camera.rect.y_size)/2);
+
+    this.clearScreen();
+    this.context_manager.context.setTransform(1,0,0,1, centering_x-offset.x, centering_y-offset.y);
     for (const element of this.entities.list) {
       if (this.physics.collide(this.camera, element)) {
-        element.draw(this.context_manager.context, interpolation);        
+        element.draw(this.context_manager.context, interpolation);
       }
     }
     // for camera debugging:
-    // this.camera.draw(this.context_manager.context, interpolation);
+    //this.camera.draw(this.context_manager.context, interpolation);
   }
 }
 

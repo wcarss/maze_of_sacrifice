@@ -14,10 +14,10 @@ class Camera {
       //height: 768,
       width: 0,
       height: 0,
-      left_margin: 0,
-      right_margin: 0,
-      top_margin: 0,
-      bottom_margin: 0,
+      left_margin: 60,
+      right_margin: 60,
+      top_margin: 60,
+      bottom_margin: 60,
       fullscreen: true,
     };
     this.width = this.camera_config.width;
@@ -54,24 +54,24 @@ class Camera {
 
   get offset () {
     return {
-      x: this.camera.x,
-      y: this.camera.y,
+      x: parseInt(this.camera.x),
+      y: parseInt(this.camera.y),
     };
   };
 
   get rect () {
     return {
-      x: this.camera.x - this.camera.left_margin,
-      y: this.camera.y - this.camera.top_margin,
-      x_size: this.camera.width + this.camera.left_margin + this.camera.right_margin,
-      y_size: this.camera.height + this.camera.top_margin + this.camera.bottom_margin,
+      x: parseInt(this.camera.x - this.camera.left_margin),
+      y: parseInt(this.camera.y - this.camera.top_margin),
+      x_size: parseInt(this.camera.width + this.camera.left_margin + this.camera.right_margin),
+      y_size: parseInt(this.camera.height + this.camera.top_margin + this.camera.bottom_margin),
     };
   }
 
   draw = (context, interpolation) => {
-    //const r = this.rect;
-    //context.strokeStyle = "blue";
-    //context.strokeRect(r.x, r.y, r.x_size, r.y_size);
+    const r = this.rect;
+    context.strokeStyle = "blue";
+    context.strokeRect(r.x, r.y, r.x_size, r.y_size);
   };
 
   center = (center_x, center_y) => {
@@ -107,8 +107,8 @@ class Camera {
           pixel_height: camera.height
         };
 
-    x = this.utils.clamp(x, 0, map.pixel_width - camera.width);
-    y = this.utils.clamp(y, 0, map.pixel_height - camera.height);
+    x = this.utils.clamp(x, 0, map.pixel_width-(camera.width+camera.left_margin));
+    y = this.utils.clamp(y, 0, map.pixel_height-(camera.height+camera.top_margin));
 
     camera.x = x;
     camera.y = y;
@@ -119,16 +119,20 @@ class Camera {
   resize = (width, height) => {
     const camera = this.camera;
     const context_manager = this.context_manager;
-    if (this.fullscreen && camera.width !== context_manager.width || camera.height !== context_manager.height) {
+    if (!width && !height) {
       width = context_manager.width;
       height = context_manager.height;
     }
+    width = this.utils.clamp(width, 0, context_manager.width);
+    height = this.utils.clamp(height, 0, context_manager.height);
+
     camera.width = width;
     camera.height = height;
     camera.x_size = width;
     camera.y_size = height;
     camera.inner_width = width / 2;
     camera.inner_height = height / 2;
+
     if (camera.desired_center_x && camera.desired_center_y) {
       this.center(camera.desired_center_x, camera.desired_center_y);
     } else {
