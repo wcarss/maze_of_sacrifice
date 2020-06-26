@@ -14,9 +14,9 @@ window.onload = async () => {
 
   await creek.resources.init(creek, Resources, player, maps);
 
-  creek.init([player, maps]);
+  creek.init([player, maps]);  
   creek.run();
   creek.data.player = player;
   creek.data.maps = maps;
-  maps.change_map(maps.make_id(0));
+  maps.change_map(Maps.make_id(0));
 };

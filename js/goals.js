@@ -1,5 +1,7 @@
 "use strict";
 
+import Maps from "./maps.js";
+
 class Start {
   constructor(creek, x, y, size) {
     this.creek = creek;
@@ -54,6 +56,7 @@ class Start {
         maps.maps[last_map_id].exit_x,
         maps.maps[last_map_id].exit_y
       );
+      data.break_update_loop = true;
     }
   };
 
@@ -118,7 +121,7 @@ class End {
       creek.audio.play("level");
       current_map.exit_x = this.x;
       current_map.exit_y = this.y;
-      if (next_map_id === "map_0") {
+      if (next_map_id === Maps.make_id(0)) {
         data.maps.maps[next_map_id].last_map_id = current_map_id;
       }
       data.maps.change_map(next_map_id);

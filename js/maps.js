@@ -30,22 +30,22 @@ class Maps {
 
     for (let i = 0; i <= this.number_of_maps; i++) {
       map = this.make_map(
-        this.make_id(i),
+        Maps.make_id(i),
         this.lookups["tile_size"][i],
         this.lookups["map_size"][i],
         this.lookups["npc_count"][i],
         this.lookups["enemy_count"][i]
       );
-      map.last_map_id = this.make_id(i - 1);
-      map.next_map_id = this.make_id(i + 1);
+      map.last_map_id = Maps.make_id(i - 1);
+      map.next_map_id = Maps.make_id(i + 1);
       this.maps[map.id] = map;
 
       if (i === 0) {
-        map.last_map_id = this.make_id(this.number_of_maps - 1);
+        map.last_map_id = Maps.make_id(this.number_of_maps - 1);
       }
 
       if (i === this.number_of_maps - 1) {
-        map.next_map_id = this.make_id(0);
+        map.next_map_id = Maps.make_id(0);
       }
     }
   };
@@ -155,7 +155,7 @@ class Maps {
     data.player = map.player;
   };
 
-  make_id = id => id;
+  static make_id = id => id;
 }
 
 export default Maps;
