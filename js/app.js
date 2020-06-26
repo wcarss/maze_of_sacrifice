@@ -10,7 +10,7 @@ window.onload = async () => {
 
   const creek = new Creek();
   const player = new Player();
-  const maps = new Maps(12);
+  const maps = new Maps(13);
 
   await creek.resources.init(creek, Resources, player, maps);
 

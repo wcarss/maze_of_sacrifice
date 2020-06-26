@@ -255,7 +255,7 @@ class Drawer {
       }
     }
     // for camera debugging:
-    //this.camera.draw(this.context_manager.context, interpolation);
+    // this.camera.draw(this.context_manager.context, interpolation);
   }
 }
 

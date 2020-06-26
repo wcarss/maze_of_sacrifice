@@ -9,13 +9,13 @@ import Enemies from "./enemies.js";
 class Maps {
   constructor(number_of_maps) {
     this.lookups = {
-      map_size: [4, 6, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 14],
-      tile_size: [60, 60, 60, 60, 60, 50, 50, 50, 50, 40, 40, 40, 24],
-      npc_count: [1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 6, 6, 8],
-      enemy_count: [0, 1, 1, 2, 2, 2, 4, 6, 6, 6, 8, 10, 12],
+      map_size:    [  4,  4,  6,  6,  6,  8,  8,  8, 10, 10, 10, 20, 30, 40, 60],
+      tile_size:   [ 96, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64],
+      npc_count:   [  1,  0,  2,  2,  2,  2,  4,  4,  4,  6,  8, 12, 12, 18, 24],
+      enemy_count: [  0,  1,  2,  4,  4,  4,  6,  6,  8,  8, 10, 12, 18, 28, 36],
     };
 
-    this.number_of_maps = number_of_maps;
+    this.number_of_maps = this.lookups.map_size.length - 1;
     this.maps = {};
     this.current_map = null;
     this.current_map_id = null;

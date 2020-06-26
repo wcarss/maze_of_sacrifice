@@ -292,6 +292,43 @@ class NewTile extends Tile {
   constructor(creek, x, y, size, wall) {
     super(creek, x, y, size);
     this.wall = wall;
+    this.ncolor_level = this.creek.utilities.random_int(8)+13;
+    this.ncolor_velo = 1;
+    if (Math.random() > 0.5) this.ncolor_velo *= -1;
+    this.ncolor_xsize = 4;
+    this.ncolor_ysize = 4;
+    this.ncolor_neighbours = {};
+    this.ncolor_velos = {};
+    for (let i = 0; i < this.ncolor_xsize; i++) {
+      for (let j = 0; j < this.ncolor_ysize; j++) {
+        this.ncolor_velos[this.get_key(i,j)] = 1.5;
+        if (Math.random() > 0.5) this.ncolor_velos[this.get_key(i,j)] *= -1;
+        this.ncolor_neighbours[this.get_key(i,j)] = this.creek.utilities.random_int(5) - 10;
+      }
+    }
+  }
+
+  update = () => {
+    if (Math.random() > 0.95) {
+      this.ncolor_level = this.ncolor_level + this.ncolor_velo;
+      if (this.ncolor_level > 25 || this.ncolor_level < 10) {
+        this.ncolor_velo *= -1;
+      }
+    }
+
+    const val = Math.random();
+    if (val > 0.1) return;
+    for (let i = 0; i < this.ncolor_xsize; i++) {
+      for (let j = 0; j < this.ncolor_ysize; j++) {
+        if (Math.random() > 0.97) {
+          const key = this.get_key(i,j);
+          this.ncolor_neighbours[key] += this.ncolor_velos[key];
+          if (Math.abs(this.ncolor_neighbours[key]) > 10) {
+            this.ncolor_velos[key] *= -1;
+          }
+        }
+      }
+    }
   }
 
   draw = (context, interpolation) => {
@@ -303,11 +340,24 @@ class NewTile extends Tile {
       context.drawImage(tree.img, this.x, this.y, this.x_size, this.y_size);
     }
     if (!this.visited) {
-      context.fillStyle = "black";
+      context.fillStyle = this.ncolor;
       if (this.revealed) {
         context.globalAlpha = 0.6;
       }
-      context.fillRect(this.x, this.y, this.x_size, this.y_size);
+      for (let i = 0; i < this.ncolor_xsize; i++) {
+        for (let j = 0; j < this.ncolor_ysize; j++) {
+          const ncolor_neighbour = this.ncolor_level + this.ncolor_neighbours[this.get_key(i,j)];
+          if (this.wall) {
+            // greenish, for trees
+            context.fillStyle = `rgb(${ncolor_neighbour/2},${ncolor_neighbour},${0})`;
+          } else {
+            // goldish, the path
+            context.fillStyle = `rgb(${ncolor_neighbour},${ncolor_neighbour},${0})`;
+          }
+          context.fillRect(Math.round(this.x+i*this.x_size/this.ncolor_xsize), Math.round(this.y+j*this.y_size/this.ncolor_ysize), Math.round(this.x_size/this.ncolor_xsize), Math.round(this.y_size/this.ncolor_ysize));
+        }
+      }
+
       if (this.revealed) {
         context.globalAlpha = 1;
       }

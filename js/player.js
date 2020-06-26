@@ -285,10 +285,6 @@ class Player {
 
     maze.visit(this.x, this.y, 1, true);
     maze.reveal(this.x, this.y, 3);
-    maze.reveal(this.x - 1, this.y - 1, 0);
-    maze.reveal(this.x + 1, this.y - 1, 0);
-    maze.reveal(this.x - 1, this.y + 1, 0);
-    maze.reveal(this.x + 1, this.y + 1, 0);
 
     this.moved_at = time.ticks;
   }
